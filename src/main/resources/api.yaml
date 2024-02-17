@@ -1,0 +1,455 @@
+openapi: 3.0.3
+
+info:
+  title: Бизнес логика
+  description: Пародия бизнес процесса загрузки видео и потребления контента c сайта https://rutube.ru
+  version: 1.0.0
+
+components:
+  schemas:
+    sourceId:
+      type: string
+      format: uuid
+      description: Идентификатор контента
+
+    uploadLink:
+      type: string
+      description: Ссылка для загрузки (upload)
+      example: https://example.site/upload/link
+
+    downloadLink:
+      type: string
+      description: Ссылка для загрузки (download)
+      example: https://example.site/download/link
+
+    title:
+      type: string
+      maxLength: 100
+      description: Название видео
+
+    description:
+      type: string
+      maxLength: 5000
+      description: Описание видео
+
+    category:
+      type: string
+      description: Категория видео
+      enum:
+        - "Аниме"
+        - "Еда"
+        - "Музыка"
+        - "Наука"
+        - "Юмор"
+
+    access:
+      type: string
+      description: Параметр доступа
+      enum:
+        - "PUBLIC"
+        - "LINK"
+        - "PRIVATE"
+
+    ageRestriction:
+      type: boolean
+      description: Флаг наличия возрастного ограничения 18+
+
+    comments:
+      type: boolean
+      description: Флаг отключения комментариев под видео
+
+    publication:
+      type: string
+      format: timestamp
+      description: Время отложенной публикации видео
+
+    status:
+      type: string
+      description: Статус видео
+      enum:
+        - "UPLOAD_PENDING"
+        - "MODERATION_PENDING"
+        - "MODERATION_FAILED"
+        - "MODERATION_SUCCESS"
+        - "READY"
+        - "PUBLISHED"
+        - "DELETED"
+
+    commentId:
+      type: string
+      format: uuid
+      description: Идентификатор комментария
+
+    content:
+      type: string
+      maxLength: 200
+      description: Содержание комментария
+
+    author:
+      type: string
+      description: Автор комментария
+
+    reaction:
+      type: string
+      description: Тип реакции
+      enum:
+        - "LIKE"
+        - "DISLIKE"
+
+    approved:
+      type: boolean
+      description: Флаг успешной модерации
+
+    reason:
+      type: string
+      description: Описание причины отказа
+
+    NewVideoResponse:
+      type: object
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/sourceId"
+        uploadLink:
+          $ref: "#/components/schemas/uploadLink"
+
+    PutVideoRequest:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/title"
+        description:
+          $ref: "#/components/schemas/description"
+        category:
+          $ref: "#/components/schemas/category"
+        access:
+          $ref: "#/components/schemas/access"
+        ageRestriction:
+          $ref: "#/components/schemas/ageRestriction"
+        comments:
+          $ref: "#/components/schemas/comments"
+        publication:
+          $ref: "#/components/schemas/publication"
+
+    GetVideoStatusResponse:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/status"
+
+    CreateCommentRequest:
+      type: object
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/sourceId"
+        parentId:
+          $ref: "#/components/schemas/commentId"
+        content:
+          $ref: "#/components/schemas/content"
+
+    CommentInfo:
+      type: object
+      properties:
+        commentId:
+          $ref: "#/components/schemas/commentId"
+        author:
+          $ref: "#/components/schemas/author"
+        content:
+          $ref: "#/components/schemas/content"
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommentInfo"
+
+    GetCommentsResponse:
+      type: object
+      properties:
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommentInfo"
+
+    CreateReactionRequest:
+      type: object
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/sourceId"
+        reaction:
+          $ref: "#/components/schemas/reaction"
+
+    ReactionInfo:
+      type: object
+      properties:
+        reaction:
+          $ref: "#/components/schemas/reaction"
+        count:
+          type: integer
+
+    GetReactionsResponse:
+      type: object
+      properties:
+        reactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReactionInfo"
+
+    GetMyReactionResponse:
+      type: object
+      properties:
+        reaction:
+          $ref: "#/components/schemas/reaction"
+
+    GetNextModerationResponse:
+      type: object
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/sourceId"
+        downloadLink:
+          $ref: "#/components/schemas/downloadLink"
+
+    UploadModerationResultRequest:
+      type: object
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/sourceId"
+        approved:
+          $ref: "#/components/schemas/approved"
+        reason:
+          $ref: "#/components/schemas/reason"
+
+
+paths:
+  /api/videos:new:
+    post:
+      summary: Инициация создания нового видео
+      tags:
+        - video
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewVideoResponse"
+        401:
+          description: UNAUTHORIZED
+
+  /api/videos/{sourceId}:
+    put:
+      summary: Заполнение данных о видео
+      tags:
+        - video
+      parameters:
+        - in: path
+          name: sourceId
+          description: Идентификатор видео (контента)
+          required: true
+          schema:
+            $ref: "#/components/schemas/sourceId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PutVideoRequest"
+      responses:
+        204:
+          description: NO CONTENT
+        400:
+          description: BAD REQUEST
+        401:
+          description: UNAUTHORIZED
+        404:
+          description: NOT FOUND
+
+  /api/videos/{sourceId}/status:
+    get:
+      summary: Получение информации о статусе видео
+      tags:
+        - video
+      parameters:
+        - in: path
+          name: sourceId
+          description: Идентификатор видео (контента)
+          required: true
+          schema:
+            $ref: "#/components/schemas/sourceId"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetVideoStatusResponse"
+        401:
+          description: UNAUTHORIZED
+        404:
+          description: NOT FOUND
+
+  /api/videos/{sourceId}:publish:
+    post:
+      summary: Публикация видео
+      tags:
+        - video
+      parameters:
+        - in: path
+          name: sourceId
+          description: Идентификатор видео (контента)
+          required: true
+          schema:
+            $ref: "#/components/schemas/sourceId"
+      responses:
+        204:
+          description: NO CONTENT
+        401:
+          description: UNAUTHORIZED
+        404:
+          description: NOT FOUND
+        409:
+          description: CONFLICT
+
+  /api/comments:
+    post:
+      summary: Создание комментария на контент
+      tags:
+        - comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentRequest"
+      responses:
+        200:
+          description: OK
+        401:
+          description: UNAUTHORIZED
+        404:
+          description: NOT FOUND
+        409:
+          description: CONFLICT
+
+    get:
+      summary: Получение комментариев под контентом
+      tags:
+        - comment
+      parameters:
+        - in: query
+          name: sourceId
+          description: Идентификатор контента
+          required: true
+          schema:
+            $ref: "#/components/schemas/sourceId"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCommentsResponse"
+        401:
+          description: UNAUTHORIZED
+        404:
+          description: NOT FOUND
+
+  /api/reactions:
+    post:
+      summary: Создание реакции на контент
+      tags:
+        - reaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReactionRequest"
+      responses:
+        200:
+          description: OK
+        401:
+          description: UNAUTHORIZED
+        404:
+          description: NOT FOUND
+        409:
+          description: CONFLICT
+
+    get:
+      summary: Получение реакций под контентом
+      tags:
+        - reaction
+      parameters:
+        - in: query
+          name: sourceId
+          description: Идентификатор контента
+          required: true
+          schema:
+            $ref: "#/components/schemas/sourceId"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetReactionsResponse"
+        401:
+          description: UNAUTHORIZED
+        404:
+          description: NOT FOUND
+
+  /api/reactions/my:
+    get:
+      summary: Получение реакции пользователя под контентом
+      tags:
+        - reaction
+      parameters:
+        - in: query
+          name: sourceId
+          description: Идентификатор контента
+          required: true
+          schema:
+            $ref: "#/components/schemas/sourceId"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetMyReactionResponse"
+        401:
+          description: UNAUTHORIZED
+        404:
+          description: NOT FOUND
+
+  /api/moderations/next:
+    get:
+      summary: Получение следующего контента для модерации
+      tags:
+        - moderation
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetNextModerationResponse"
+        401:
+          description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
+
+  /api/moderations:
+    post:
+      summary: Загрузка результата модерации
+      tags:
+        - moderation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadModerationResultRequest"
+      responses:
+        200:
+          description: OK
+        401:
+          description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
+        404:
+          description: NOT FOUND
+
