@@ -59,8 +59,8 @@ components:
       description: Флаг отключения комментариев под видео
 
     publication:
-      type: string
-      format: timestamp
+      type: integer
+      format: int64
       description: Время отложенной публикации видео
 
     status:
@@ -317,8 +317,8 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateCommentRequest"
       responses:
-        200:
-          description: OK
+        204:
+          description: NO CONTENT
         401:
           description: UNAUTHORIZED
         404:
@@ -360,8 +360,8 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateReactionRequest"
       responses:
-        200:
-          description: OK
+        204:
+          description: NO CONTENT
         401:
           description: UNAUTHORIZED
         404:
@@ -444,8 +444,8 @@ paths:
             schema:
               $ref: "#/components/schemas/UploadModerationResultRequest"
       responses:
-        200:
-          description: OK
+        204:
+          description: NO CONTENT
         401:
           description: UNAUTHORIZED
         403:
