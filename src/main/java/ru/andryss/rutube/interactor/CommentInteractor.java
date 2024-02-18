@@ -4,7 +4,7 @@ import ru.andryss.rutube.message.CreateCommentRequest;
 import ru.andryss.rutube.message.GetCommentsResponse;
 
 /**
- * Interactor for handling comment request
+ * Interactor for handling comment requests
  */
 public interface CommentInteractor {
     /**

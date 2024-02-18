@@ -32,7 +32,6 @@ public class CommentServiceImpl implements CommentService {
             throw new CommentsDisableException(sourceId);
         }
 
-
         if (parentId != null) {
             Comment parent = commentRepository.findById(parentId).orElseThrow(() -> new CommentNotFoundException(parentId));
             if (!parent.getSourceId().equals(sourceId)) {
