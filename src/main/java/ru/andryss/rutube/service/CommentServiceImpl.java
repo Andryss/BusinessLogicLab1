@@ -7,8 +7,6 @@ import ru.andryss.rutube.exception.CommentsDisableException;
 import ru.andryss.rutube.exception.ParentSourceDifferentException;
 import ru.andryss.rutube.exception.VideoNotFoundException;
 import ru.andryss.rutube.message.CommentInfo;
-import ru.andryss.rutube.message.CreateCommentRequest;
-import ru.andryss.rutube.message.GetCommentsResponse;
 import ru.andryss.rutube.model.Comment;
 import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.repository.CommentRepository;
@@ -28,15 +26,13 @@ public class CommentServiceImpl implements CommentService {
     private final VideoRepository videoRepository;
 
     @Override
-    public void createComment(CreateCommentRequest request) {
-        String sourceId = request.getSourceId();
+    public void createComment(String sourceId, String parentId, String content) {
         Video video = videoRepository.findById(sourceId).orElseThrow(() -> new VideoNotFoundException(sourceId));
         if (!video.isComments()) {
             throw new CommentsDisableException(sourceId);
         }
 
 
-        String parentId = request.getParentId();
         if (parentId != null) {
             Comment parent = commentRepository.findById(parentId).orElseThrow(() -> new CommentNotFoundException(parentId));
             if (!parent.getSourceId().equals(sourceId)) {
@@ -47,7 +43,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = new Comment();
         comment.setSourceId(sourceId);
         comment.setParent(parentId);
-        comment.setContent(request.getContent());
+        comment.setContent(content);
         comment.setAuthor("some author");
         comment.setCreatedAt(Instant.now());
 
@@ -55,7 +51,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public GetCommentsResponse getComments(String sourceId) {
+    public List<CommentInfo> getComments(String sourceId) {
         if (!videoRepository.existsById(sourceId)) {
             throw new VideoNotFoundException(sourceId);
         }
@@ -78,10 +74,7 @@ public class CommentServiceImpl implements CommentService {
 
         List<CommentInfo> rootComments = new ArrayList<>();
         childrenIdsById.get(null).forEach(id -> rootComments.add(constructCommentInfo(id, infoById, childrenIdsById)));
-
-        GetCommentsResponse response = new GetCommentsResponse();
-        response.setComments(rootComments);
-        return response;
+        return rootComments;
     }
 
     private CommentInfo constructCommentInfo(String commentId, Map<String, CommentInfo> infoById, Map<String, List<String>> childrenIdsById) {
