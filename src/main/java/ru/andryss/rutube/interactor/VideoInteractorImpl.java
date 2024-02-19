@@ -1,6 +1,7 @@
 package ru.andryss.rutube.interactor;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import ru.andryss.rutube.message.GetStatusResponse;
 import ru.andryss.rutube.message.NewVideoResponse;
@@ -19,13 +20,10 @@ public class VideoInteractorImpl implements VideoInteractor {
     private final VideoService videoService;
 
     @Override
-    public NewVideoResponse postApiVideosNew(String prototype) {
-        // TODO: determine user
-        String username = "username";
-
+    public NewVideoResponse postApiVideosNew(String prototype, User user) {
         String sourceId = UUID.randomUUID().toString();
         String uploadLink = sourceService.generateUploadLink(sourceId);
-        videoService.createNewVideo(sourceId, username, prototype);
+        videoService.createNewVideo(sourceId, user.getUsername(), prototype);
 
         NewVideoResponse response = new NewVideoResponse();
         response.setSourceId(sourceId);
@@ -34,31 +32,21 @@ public class VideoInteractorImpl implements VideoInteractor {
     }
 
     @Override
-    public void putApiVideos(String sourceId, PutVideoRequest request) {
-        // TODO: determine user
-        String username = "username";
-
+    public void putApiVideos(String sourceId, PutVideoRequest request, User user) {
         VideoInfo videoInfo = new VideoInfo(request.getTitle(), request.getDescription(), request.getCategory(),
                 request.getAccess(), request.isAgeRestriction(), request.isComments());
-
-        videoService.putVideo(sourceId, username, videoInfo);
+        videoService.putVideo(sourceId, user.getUsername(), videoInfo);
     }
 
     @Override
-    public GetStatusResponse getApiVideosStatus(String sourceId) {
-        // TODO: determine user
-        String username = "username";
-
+    public GetStatusResponse getApiVideosStatus(String sourceId, User user) {
         GetStatusResponse response = new GetStatusResponse();
-        response.setStatus(videoService.getVideoStatus(sourceId, username));
+        response.setStatus(videoService.getVideoStatus(sourceId, user.getUsername()));
         return response;
     }
 
     @Override
-    public void postApiVideosPublish(String sourceId) {
-        // TODO: determine user
-        String username = "username";
-
-        videoService.publishVideo(sourceId, username);
+    public void postApiVideosPublish(String sourceId, User user) {
+        videoService.publishVideo(sourceId, user.getUsername());
     }
 }

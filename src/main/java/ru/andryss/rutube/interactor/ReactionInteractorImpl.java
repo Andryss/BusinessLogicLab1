@@ -1,6 +1,7 @@
 package ru.andryss.rutube.interactor;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import ru.andryss.rutube.message.CreateReactionRequest;
 import ru.andryss.rutube.message.GetMyReactionResponse;
@@ -14,11 +15,8 @@ public class ReactionInteractorImpl implements ReactionInteractor {
     private final ReactionService reactionService;
 
     @Override
-    public void postApiReactions(CreateReactionRequest request) {
-        // TODO: determine user
-        String username = "username";
-
-        reactionService.createReaction(request.getSourceId(), username, request.getReaction());
+    public void postApiReactions(CreateReactionRequest request, User user) {
+        reactionService.createReaction(request.getSourceId(), user.getUsername(), request.getReaction());
     }
 
     @Override
@@ -29,12 +27,9 @@ public class ReactionInteractorImpl implements ReactionInteractor {
     }
 
     @Override
-    public GetMyReactionResponse getApiReactionsMy(String sourceId) {
-        // TODO: determine user
-        String username = "username";
-
+    public GetMyReactionResponse getApiReactionsMy(String sourceId, User user) {
         GetMyReactionResponse response = new GetMyReactionResponse();
-        response.setReaction(reactionService.getMyReaction(sourceId, username).orElse(null));
+        response.setReaction(reactionService.getMyReaction(sourceId, user.getUsername()).orElse(null));
         return response;
     }
 }

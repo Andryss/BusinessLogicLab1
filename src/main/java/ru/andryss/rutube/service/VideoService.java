@@ -1,5 +1,6 @@
 package ru.andryss.rutube.service;
 
+import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.model.VideoAccess;
 import ru.andryss.rutube.model.VideoCategory;
 import ru.andryss.rutube.model.VideoStatus;
@@ -42,6 +43,14 @@ public interface VideoService {
      * @param author publishing user
      */
     void publishVideo(String sourceId, String author);
+
+    /**
+     * Finds published video
+     *
+     * @param sourceId video to search
+     * @return found video
+     */
+    Video findPublishedVideo(String sourceId);
 
     record VideoInfo(String title, String description, VideoCategory category, VideoAccess access,
                      Boolean ageRestriction, Boolean comments) { }

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +24,13 @@ public class ReactionController {
     @PostMapping("/api/reactions")
     public ResponseEntity<?> postApiReactions(
             @RequestBody @Valid CreateReactionRequest request,
-            BindingResult bindingResult
-    ) {
+            BindingResult bindingResult,
+            @AuthenticationPrincipal User user
+            ) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationException(bindingResult);
         }
-        interactor.postApiReactions(request);
+        interactor.postApiReactions(request, user);
         return ResponseEntity.noContent().build();
     }
 
@@ -40,8 +43,9 @@ public class ReactionController {
 
     @GetMapping("/api/reactions/my")
     public ResponseEntity<?> getApiReactionsMy(
-            @RequestParam @NotBlank @UUID String sourceId
+            @RequestParam @NotBlank @UUID String sourceId,
+            @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok(interactor.getApiReactionsMy(sourceId));
+        return ResponseEntity.ok(interactor.getApiReactionsMy(sourceId, user));
     }
 }

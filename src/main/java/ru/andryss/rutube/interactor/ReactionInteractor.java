@@ -1,5 +1,6 @@
 package ru.andryss.rutube.interactor;
 
+import org.springframework.security.core.userdetails.User;
 import ru.andryss.rutube.message.CreateReactionRequest;
 import ru.andryss.rutube.message.GetMyReactionResponse;
 import ru.andryss.rutube.message.GetReactionsResponse;
@@ -11,7 +12,7 @@ public interface ReactionInteractor {
     /**
      * Handles POST /api/reactions request
      */
-    void postApiReactions(CreateReactionRequest request);
+    void postApiReactions(CreateReactionRequest request, User user);
     /**
      * Handles GET /api/reactions request
      */
@@ -19,5 +20,5 @@ public interface ReactionInteractor {
     /**
      * Handles GET /api/reactions/my request
      */
-    GetMyReactionResponse getApiReactionsMy(String sourceId);
+    GetMyReactionResponse getApiReactionsMy(String sourceId, User user);
 }

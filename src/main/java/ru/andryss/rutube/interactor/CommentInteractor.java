@@ -1,5 +1,6 @@
 package ru.andryss.rutube.interactor;
 
+import org.springframework.security.core.userdetails.User;
 import ru.andryss.rutube.message.CreateCommentRequest;
 import ru.andryss.rutube.message.GetCommentsResponse;
 
@@ -10,7 +11,7 @@ public interface CommentInteractor {
     /**
      * Handles POST /api/comments request
      */
-    void postApiComments(CreateCommentRequest request);
+    void postApiComments(CreateCommentRequest request, User user);
 
     /**
      * Handles GET /api/comments request

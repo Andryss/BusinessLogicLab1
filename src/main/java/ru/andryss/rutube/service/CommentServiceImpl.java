@@ -5,12 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.andryss.rutube.exception.CommentNotFoundException;
 import ru.andryss.rutube.exception.CommentsDisableException;
 import ru.andryss.rutube.exception.ParentSourceDifferentException;
-import ru.andryss.rutube.exception.VideoNotFoundException;
 import ru.andryss.rutube.message.CommentInfo;
 import ru.andryss.rutube.model.Comment;
 import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.repository.CommentRepository;
-import ru.andryss.rutube.repository.VideoRepository;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -23,11 +21,11 @@ import java.util.Map;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
-    private final VideoRepository videoRepository;
+    private final VideoService videoService;
 
     @Override
     public void createComment(String sourceId, String author, String parentId, String content) {
-        Video video = videoRepository.findById(sourceId).orElseThrow(() -> new VideoNotFoundException(sourceId));
+        Video video = videoService.findPublishedVideo(sourceId);
         if (!video.isComments()) {
             throw new CommentsDisableException(sourceId);
         }
@@ -51,8 +49,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentInfo> getComments(String sourceId) {
-        if (!videoRepository.existsById(sourceId)) {
-            throw new VideoNotFoundException(sourceId);
+        Video video = videoService.findPublishedVideo(sourceId);
+        if (!video.isComments()) {
+            throw new CommentsDisableException(sourceId);
         }
 
         List<Comment> comments = commentRepository.findAllBySourceIdOrderByCreatedAt(sourceId);

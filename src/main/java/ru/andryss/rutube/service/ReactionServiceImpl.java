@@ -24,14 +24,12 @@ import static java.util.stream.Collectors.groupingBy;
 @RequiredArgsConstructor
 public class ReactionServiceImpl implements ReactionService {
 
-    private final VideoRepository videoRepository;
+    private final VideoService videoService;
     private final ReactionRepository reactionRepository;
 
     @Override
     public void createReaction(String sourceId, String author, ReactionType reactionType) {
-        if (!videoRepository.existsById(sourceId)) {
-            throw new VideoNotFoundException(sourceId);
-        }
+        videoService.findPublishedVideo(sourceId);
 
         Reaction reaction = reactionRepository.findById(new ReactionKey(sourceId, author)).orElseGet(() -> {
             Reaction r = new Reaction();
@@ -48,9 +46,7 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Override
     public List<ReactionInfo> getAllReactions(String sourceId) {
-        if (!videoRepository.existsById(sourceId)) {
-            throw new VideoNotFoundException(sourceId);
-        }
+        videoService.findPublishedVideo(sourceId);
         
         Map<ReactionType, Long> reactionsCount = reactionRepository.findAllReactionsBySource(sourceId).stream()
                 .collect(groupingBy(identity(), counting()));
@@ -63,9 +59,7 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Override
     public Optional<ReactionType> getMyReaction(String sourceId, String author) {
-        if (!videoRepository.existsById(sourceId)) {
-            throw new VideoNotFoundException(sourceId);
-        }
+        videoService.findPublishedVideo(sourceId);
         
         return reactionRepository.findById(new ReactionKey(sourceId, author)).map(Reaction::getType);
     }

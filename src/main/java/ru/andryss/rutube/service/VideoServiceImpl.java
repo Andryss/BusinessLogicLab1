@@ -98,4 +98,15 @@ public class VideoServiceImpl implements VideoService {
 
         videoRepository.save(video);
     }
+
+    @Override
+    public Video findPublishedVideo(String sourceId) {
+        Video video = videoRepository.findById(sourceId).orElseThrow(() -> new VideoNotFoundException(sourceId));
+
+        if (video.getStatus() != PUBLISHED) {
+            throw new VideoNotFoundException(sourceId);
+        }
+
+        return video;
+    }
 }
