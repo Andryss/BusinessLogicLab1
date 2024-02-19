@@ -1,9 +1,9 @@
 package ru.andryss.rutube.message;
 
-import lombok.Setter;
+import lombok.Data;
 import ru.andryss.rutube.model.VideoStatus;
 
-@Setter
+@Data
 public class GetStatusResponse {
     VideoStatus status;
 }

@@ -3,7 +3,7 @@ package ru.andryss.rutube.controller;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,6 +15,11 @@ public class CustomControllerAdvice {
 
     @ExceptionHandler(ConstraintViolationException.class)
     ResponseEntity<?> handleConstraintViolation(ConstraintViolationException e) {
+        return handleError(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
         return handleError(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
@@ -31,6 +36,16 @@ public class CustomControllerAdvice {
     @ExceptionHandler(VideoNotFoundException.class)
     ResponseEntity<?> handleVideoNotFound(VideoNotFoundException e) {
         return handleError(HttpStatus.NOT_FOUND, String.format("video %s not found", e.getMessage()));
+    }
+
+    @ExceptionHandler(IncorrectVideoStatusException.class)
+    ResponseEntity<?> handleIncorrectVideoStatus(IncorrectVideoStatusException e) {
+        return handleError(HttpStatus.CONFLICT, String.format("video has status %s but expected %s", e.getReal(), e.getExpected()));
+    }
+
+    @ExceptionHandler(VideoAlreadyPublishedException.class)
+    ResponseEntity<?> handleVideoAlreadyPublished(VideoAlreadyPublishedException e) {
+        return handleError(HttpStatus.CONFLICT, String.format("video %s has already published", e.getMessage()));
     }
 
     @ExceptionHandler(CommentsDisableException.class)

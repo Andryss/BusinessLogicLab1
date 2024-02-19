@@ -36,11 +36,11 @@ components:
       type: string
       description: Категория видео
       enum:
-        - "Аниме"
-        - "Еда"
-        - "Музыка"
-        - "Наука"
-        - "Юмор"
+        - "ANIME"
+        - "FOOD"
+        - "MUSIC"
+        - "SCIENCE"
+        - "HUMOUR"
 
     access:
       type: string
@@ -70,7 +70,7 @@ components:
         - "UPLOAD_PENDING"
         - "MODERATION_PENDING"
         - "MODERATION_FAILED"
-        - "MODERATION_SUCCESS"
+        - "FILL_PENDING"
         - "READY"
         - "PUBLISHED"
         - "DELETED"

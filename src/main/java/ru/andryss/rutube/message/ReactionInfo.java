@@ -1,10 +1,12 @@
 package ru.andryss.rutube.message;
 
 import lombok.AllArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.andryss.rutube.model.ReactionType;
 
-@Setter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class ReactionInfo {
     ReactionType reaction;

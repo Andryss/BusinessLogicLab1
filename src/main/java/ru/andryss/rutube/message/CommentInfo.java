@@ -1,11 +1,11 @@
 package ru.andryss.rutube.message;
 
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.Instant;
 import java.util.List;
 
-@Setter
+@Data
 public class CommentInfo {
     String commentId;
     String author;

@@ -14,7 +14,10 @@ public class CommentInteractorImpl implements CommentInteractor {
 
     @Override
     public void postApiComments(CreateCommentRequest request) {
-        commentService.createComment(request.getSourceId(), request.getParentId(), request.getContent());
+        // TODO: determine user
+        String username = "username";
+
+        commentService.createComment(request.getSourceId(), username, request.getParentId(), request.getContent());
     }
 
     @Override

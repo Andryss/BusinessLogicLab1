@@ -28,18 +28,15 @@ public class ReactionServiceImpl implements ReactionService {
     private final ReactionRepository reactionRepository;
 
     @Override
-    public void createReaction(String sourceId, ReactionType reactionType) {
+    public void createReaction(String sourceId, String author, ReactionType reactionType) {
         if (!videoRepository.existsById(sourceId)) {
             throw new VideoNotFoundException(sourceId);
         }
 
-        // TODO: determine user
-        String username = "username";
-
-        Reaction reaction = reactionRepository.findById(new ReactionKey(sourceId, username)).orElseGet(() -> {
+        Reaction reaction = reactionRepository.findById(new ReactionKey(sourceId, author)).orElseGet(() -> {
             Reaction r = new Reaction();
             r.setSourceId(sourceId);
-            r.setAuthor(username);
+            r.setAuthor(author);
             return r;
         });
         
@@ -65,14 +62,11 @@ public class ReactionServiceImpl implements ReactionService {
     }
 
     @Override
-    public Optional<ReactionType> getMyReaction(String sourceId) {
+    public Optional<ReactionType> getMyReaction(String sourceId, String author) {
         if (!videoRepository.existsById(sourceId)) {
             throw new VideoNotFoundException(sourceId);
         }
         
-        // TODO: determine user
-        String username = "username";
-        
-        return reactionRepository.findById(new ReactionKey(sourceId, username)).map(Reaction::getType);
+        return reactionRepository.findById(new ReactionKey(sourceId, author)).map(Reaction::getType);
     }
 }

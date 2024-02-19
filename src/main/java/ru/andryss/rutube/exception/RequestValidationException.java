@@ -9,7 +9,6 @@ public class RequestValidationException extends RuntimeException {
     private final BindingResult bindingResult;
 
     public RequestValidationException(BindingResult bindingResult) {
-        super();
         this.bindingResult = bindingResult;
     }
 }

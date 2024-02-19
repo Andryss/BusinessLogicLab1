@@ -19,8 +19,10 @@ public class VideoController {
     private final VideoInteractor interactor;
 
     @PostMapping("/api/videos:new")
-    public ResponseEntity<?> postApiVideosNew() {
-        return ResponseEntity.ok(interactor.postApiVideosNew());
+    public ResponseEntity<?> postApiVideosNew(
+            @RequestParam(required = false) @UUID String prototype
+    ) {
+        return ResponseEntity.ok(interactor.postApiVideosNew(prototype));
     }
 
     @PutMapping("/api/videos/{sourceId}")

@@ -26,7 +26,7 @@ public class CommentServiceImpl implements CommentService {
     private final VideoRepository videoRepository;
 
     @Override
-    public void createComment(String sourceId, String parentId, String content) {
+    public void createComment(String sourceId, String author, String parentId, String content) {
         Video video = videoRepository.findById(sourceId).orElseThrow(() -> new VideoNotFoundException(sourceId));
         if (!video.isComments()) {
             throw new CommentsDisableException(sourceId);
@@ -43,7 +43,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setSourceId(sourceId);
         comment.setParent(parentId);
         comment.setContent(content);
-        comment.setAuthor("some author");
+        comment.setAuthor(author);
         comment.setCreatedAt(Instant.now());
 
         commentRepository.save(comment);
@@ -55,7 +55,7 @@ public class CommentServiceImpl implements CommentService {
             throw new VideoNotFoundException(sourceId);
         }
 
-        List<Comment> comments = commentRepository.findAllBySourceId(sourceId);
+        List<Comment> comments = commentRepository.findAllBySourceIdOrderByCreatedAt(sourceId);
 
         Map<String, CommentInfo> infoById = new HashMap<>();
         Map<String, List<String>> childrenIdsById = new HashMap<>();
@@ -72,13 +72,13 @@ public class CommentServiceImpl implements CommentService {
         });
 
         List<CommentInfo> rootComments = new ArrayList<>();
-        childrenIdsById.get(null).forEach(id -> rootComments.add(constructCommentInfo(id, infoById, childrenIdsById)));
+        childrenIdsById.getOrDefault(null, List.of()).forEach(id -> rootComments.add(constructCommentInfo(id, infoById, childrenIdsById)));
         return rootComments;
     }
 
     private CommentInfo constructCommentInfo(String commentId, Map<String, CommentInfo> infoById, Map<String, List<String>> childrenIdsById) {
         ArrayList<CommentInfo> children = new ArrayList<>();
-        childrenIdsById.get(commentId).forEach(id -> children.add(constructCommentInfo(id, infoById, childrenIdsById)));
+        childrenIdsById.getOrDefault(commentId, List.of()).forEach(id -> children.add(constructCommentInfo(id, infoById, childrenIdsById)));
         CommentInfo info = infoById.get(commentId);
         info.setChildren(children);
         return info;

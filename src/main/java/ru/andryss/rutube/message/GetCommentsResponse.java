@@ -1,10 +1,10 @@
 package ru.andryss.rutube.message;
 
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
-@Setter
+@Data
 public class GetCommentsResponse {
     List<CommentInfo> comments;
 }

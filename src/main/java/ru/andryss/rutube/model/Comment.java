@@ -3,6 +3,7 @@ package ru.andryss.rutube.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import static jakarta.persistence.GenerationType.UUID;
 @Getter
 @Setter
 @Entity
+@Table(name = "comments")
 public class Comment {
     @Id
     @GeneratedValue(strategy = UUID)

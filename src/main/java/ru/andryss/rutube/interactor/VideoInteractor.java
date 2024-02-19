@@ -11,7 +11,7 @@ public interface VideoInteractor {
     /**
      * Handles POST /api/videos:new request
      */
-    NewVideoResponse postApiVideosNew();
+    NewVideoResponse postApiVideosNew(String prototype);
     /**
      * Handles PUT /api/videos/{sourceId} request
      */

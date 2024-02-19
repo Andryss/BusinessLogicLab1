@@ -12,10 +12,11 @@ public interface CommentService {
      * Creates a comment
      *
      * @param sourceId source to post comment
+     * @param author commenting user
      * @param parentId parent comment (in case of reply)
      * @param content comment content
      */
-    void createComment(String sourceId, String parentId, String content);
+    void createComment(String sourceId, String author, String parentId, String content);
 
     /**
      * Gets comments on given source

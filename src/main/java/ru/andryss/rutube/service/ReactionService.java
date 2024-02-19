@@ -14,9 +14,10 @@ public interface ReactionService {
      * Creates reaction on given source
      *
      * @param sourceId source to create reaction
+     * @param author creating user
      * @param reaction type of reaction
      */
-    void createReaction(String sourceId, ReactionType reaction);
+    void createReaction(String sourceId, String author, ReactionType reaction);
 
     /**
      * Counts all reactions on given source
@@ -28,8 +29,10 @@ public interface ReactionService {
 
     /**
      * Get current user reaction on given source
-     * @param sourceId source to get reaction
+     *
+     * @param sourceId source to get reaction on
+     * @param author user to search
      * @return reaction type
      */
-    Optional<ReactionType> getMyReaction(String sourceId);
+    Optional<ReactionType> getMyReaction(String sourceId, String author);
 }

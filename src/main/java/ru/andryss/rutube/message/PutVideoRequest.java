@@ -21,7 +21,6 @@ public class PutVideoRequest {
     VideoCategory category;
     @NotNull
     VideoAccess access;
-    Boolean ageRestriction;
-    Boolean comments;
-    Instant publication;
+    boolean ageRestriction = false;
+    boolean comments = true;
 }

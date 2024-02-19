@@ -1,8 +1,8 @@
 package ru.andryss.rutube.message;
 
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
+@Data
 public class NewVideoResponse {
     String sourceId;
     String uploadLink;
