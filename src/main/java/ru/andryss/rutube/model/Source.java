@@ -6,19 +6,12 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
-
 @Getter
 @Setter
 @Entity
-@Table(name = "moderation_requests")
-public class ModerationRequest {
+@Table(name = "sources")
+public class Source {
     @Id
     String sourceId;
-
-    String assignee;
-
-    Instant createdAt;
-    
-    Instant assignedAt;
+    byte[] content;
 }

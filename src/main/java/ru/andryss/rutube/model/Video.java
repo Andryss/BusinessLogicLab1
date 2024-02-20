@@ -31,9 +31,9 @@ public class Video {
     @Enumerated(STRING)
     VideoAccess access;
 
-    boolean ageRestriction;
+    boolean ageRestriction = false;
 
-    boolean comments;
+    boolean comments = true;
 
     @Enumerated(STRING)
     VideoStatus status;

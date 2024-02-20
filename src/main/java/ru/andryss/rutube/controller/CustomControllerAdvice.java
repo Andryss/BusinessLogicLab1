@@ -28,6 +28,11 @@ public class CustomControllerAdvice {
         return handleError(HttpStatus.BAD_REQUEST, String.format("request parameter %s is missing", e.getParameterName()));
     }
 
+    @ExceptionHandler(IllegalVideoException.class)
+    ResponseEntity<?> handleIllegalVideo() {
+        return handleError(HttpStatus.BAD_REQUEST, "wrong video format");
+    }
+
     @ExceptionHandler(RequestValidationException.class)
     ResponseEntity<?> handleRequestValidation(RequestValidationException e) {
         return handleError(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -36,6 +41,16 @@ public class CustomControllerAdvice {
     @ExceptionHandler(VideoNotFoundException.class)
     ResponseEntity<?> handleVideoNotFound(VideoNotFoundException e) {
         return handleError(HttpStatus.NOT_FOUND, String.format("video %s not found", e.getMessage()));
+    }
+
+    @ExceptionHandler(SourceNotFoundException.class)
+    ResponseEntity<?> handleSourceNotFound(SourceNotFoundException e) {
+        return handleError(HttpStatus.NOT_FOUND, String.format("source %s not found", e.getMessage()));
+    }
+
+    @ExceptionHandler(LinkNotFountException.class)
+    ResponseEntity<?> handleLinkNotFount(LinkNotFountException e) {
+        return handleError(HttpStatus.NOT_FOUND, String.format("link for id %s not found", e.getMessage()));
     }
 
     @ExceptionHandler(IncorrectVideoStatusException.class)

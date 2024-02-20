@@ -96,13 +96,16 @@ components:
         - "LIKE"
         - "DISLIKE"
 
-    approved:
-      type: boolean
-      description: Флаг успешной модерации
-
-    reason:
+    result:
       type: string
-      description: Описание причины отказа
+      description: Результат модерации
+      enum:
+        - "SUCCESS"
+        - "FAILURE"
+
+    comment:
+      type: string
+      description: Комментарий к результату модерации
 
     NewVideoResponse:
       type: object
@@ -212,10 +215,10 @@ components:
       properties:
         sourceId:
           $ref: "#/components/schemas/sourceId"
-        approved:
-          $ref: "#/components/schemas/approved"
-        reason:
-          $ref: "#/components/schemas/reason"
+        result:
+          $ref: "#/components/schemas/result"
+        comment:
+          $ref: "#/components/schemas/comment"
 
 
 paths:
@@ -417,7 +420,7 @@ paths:
         404:
           description: NOT FOUND
 
-  /api/moderations/next:
+  /api/moderation/next:
     get:
       summary: Получение следующего контента для модерации
       tags:
@@ -434,7 +437,7 @@ paths:
         403:
           description: FORBIDDEN
 
-  /api/moderations:
+  /api/moderation:
     post:
       summary: Загрузка результата модерации
       tags:
