@@ -6,6 +6,5 @@ public enum VideoStatus {
     MODERATION_FAILED,
     FILL_PENDING,
     READY,
-    PUBLISHED,
-    DELETED
+    PUBLISHED
 }

@@ -13,13 +13,8 @@ import ru.andryss.rutube.message.ErrorMessage;
 @ControllerAdvice
 public class CustomControllerAdvice {
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    ResponseEntity<?> handleConstraintViolation(ConstraintViolationException e) {
-        return handleError(HttpStatus.BAD_REQUEST, e.getMessage());
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+    @ExceptionHandler({ConstraintViolationException.class, HttpMessageNotReadableException.class})
+    ResponseEntity<?> handleBadRequest(Exception e) {
         return handleError(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
@@ -31,11 +26,6 @@ public class CustomControllerAdvice {
     @ExceptionHandler(IllegalVideoException.class)
     ResponseEntity<?> handleIllegalVideo() {
         return handleError(HttpStatus.BAD_REQUEST, "wrong video format");
-    }
-
-    @ExceptionHandler(RequestValidationException.class)
-    ResponseEntity<?> handleRequestValidation(RequestValidationException e) {
-        return handleError(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler(VideoNotFoundException.class)

@@ -11,6 +11,7 @@ import ru.andryss.rutube.repository.VideoRepository;
 
 import java.time.Instant;
 
+import static ru.andryss.rutube.model.VideoAccess.PUBLIC;
 import static ru.andryss.rutube.model.VideoStatus.*;
 
 @Service
@@ -32,7 +33,7 @@ public class VideoServiceImpl implements VideoService {
         video.setUpdatedAt(now);
 
         if (prototype != null) {
-            Video proto = videoRepository.findBySourceIdAndAuthor(sourceId, author).orElseThrow(() -> new VideoNotFoundException(sourceId));
+            Video proto = videoRepository.findBySourceIdAndAuthor(prototype, author).orElseThrow(() -> new VideoNotFoundException(sourceId));
             video.setTitle(proto.getTitle());
             video.setDescription(proto.getDescription());
             video.setCategory(proto.getCategory());
@@ -47,10 +48,6 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public void putVideo(String sourceId, String author, VideoInfo info) {
         Video video = videoRepository.findBySourceIdAndAuthor(sourceId, author).orElseThrow(() -> new VideoNotFoundException(sourceId));
-
-        if (video.getStatus() == DELETED) {
-            throw new VideoNotFoundException(sourceId);
-        }
 
         if (video.getStatus() == PUBLISHED) {
             throw new VideoAlreadyPublishedException(sourceId);
@@ -75,20 +72,12 @@ public class VideoServiceImpl implements VideoService {
     public VideoStatus getVideoStatus(String sourceId, String author) {
         Video video = videoRepository.findBySourceIdAndAuthor(sourceId, author).orElseThrow(() -> new VideoNotFoundException(sourceId));
 
-        if (video.getStatus() == DELETED) {
-            throw new VideoNotFoundException(sourceId);
-        }
-
         return video.getStatus();
     }
 
     @Override
     public void publishVideo(String sourceId, String author) {
         Video video = videoRepository.findBySourceIdAndAuthor(sourceId, author).orElseThrow(() -> new VideoNotFoundException(sourceId));
-
-        if (video.getStatus() == DELETED) {
-            throw new VideoNotFoundException(sourceId);
-        }
 
         if (video.getStatus() != READY) {
             throw new IncorrectVideoStatusException(video.getStatus(), READY);
@@ -103,7 +92,7 @@ public class VideoServiceImpl implements VideoService {
     public Video findPublishedVideo(String sourceId) {
         Video video = videoRepository.findById(sourceId).orElseThrow(() -> new VideoNotFoundException(sourceId));
 
-        if (video.getStatus() != PUBLISHED) {
+        if (video.getStatus() != PUBLISHED || video.getAccess() != PUBLIC) {
             throw new VideoNotFoundException(sourceId);
         }
 

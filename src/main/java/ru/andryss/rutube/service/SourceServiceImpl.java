@@ -45,10 +45,10 @@ public class SourceServiceImpl implements SourceService {
         if (file.getContentType() == null) {
             throw new IllegalVideoException();
         }
-        if (!file.getContentType().startsWith("video/")) {
+        if (!file.getContentType().equals("video/mp4")) {
             throw new IllegalVideoException();
         }
-        if (file.getSize() <= 0 || file.getSize() > 5 * 1024 * 1024) {
+        if (file.getSize() <= 0 || file.getSize() > 10 * 1024 * 1024) {
             throw new IllegalVideoException();
         }
 

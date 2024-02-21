@@ -25,4 +25,12 @@ public interface ModerationService {
      * @param comment result comment (e.g. reject reason)
      */
     void uploadModeration(String sourceId, String username, ModerationStatus status, String comment);
+
+    /**
+     * Find comment of moderation result
+     *
+     * @param sourceId source to search
+     * @return moderation comment
+     */
+    String getModerationComment(String sourceId);
 }

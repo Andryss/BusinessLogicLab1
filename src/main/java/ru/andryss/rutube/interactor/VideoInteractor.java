@@ -1,7 +1,7 @@
 package ru.andryss.rutube.interactor;
 
 import org.springframework.security.core.userdetails.User;
-import ru.andryss.rutube.message.GetStatusResponse;
+import ru.andryss.rutube.message.GetVideoStatusResponse;
 import ru.andryss.rutube.message.NewVideoResponse;
 import ru.andryss.rutube.message.PutVideoRequest;
 
@@ -20,7 +20,7 @@ public interface VideoInteractor {
     /**
      * Handles GET /api/videos/{sourceId}/status request
      */
-    GetStatusResponse getApiVideosStatus(String sourceId, User user);
+    GetVideoStatusResponse getApiVideosStatus(String sourceId, User user);
     /**
      * Handles POST /api/videos/{sourceId}:publish request
      */

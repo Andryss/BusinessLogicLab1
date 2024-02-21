@@ -67,4 +67,10 @@ public class ModerationServiceImpl implements ModerationService {
         requestRepository.delete(request);
 
     }
+
+    @Override
+    public String getModerationComment(String sourceId) {
+        ModerationResult result = resultRepository.findById(sourceId).orElseThrow(() -> new SourceNotFoundException(sourceId));
+        return result.getComment();
+    }
 }

@@ -73,7 +73,6 @@ components:
         - "FILL_PENDING"
         - "READY"
         - "PUBLISHED"
-        - "DELETED"
 
     commentId:
       type: string
@@ -138,6 +137,8 @@ components:
       properties:
         status:
           $ref: "#/components/schemas/status"
+        comment:
+          $ref: "#/components/schemas/comment"
 
     CreateCommentRequest:
       type: object

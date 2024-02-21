@@ -3,14 +3,18 @@ package ru.andryss.rutube.interactor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
-import ru.andryss.rutube.message.GetStatusResponse;
+import ru.andryss.rutube.message.GetVideoStatusResponse;
 import ru.andryss.rutube.message.NewVideoResponse;
 import ru.andryss.rutube.message.PutVideoRequest;
+import ru.andryss.rutube.model.VideoStatus;
+import ru.andryss.rutube.service.ModerationService;
 import ru.andryss.rutube.service.SourceService;
 import ru.andryss.rutube.service.VideoService;
 import ru.andryss.rutube.service.VideoService.VideoInfo;
 
 import java.util.UUID;
+
+import static ru.andryss.rutube.model.VideoStatus.MODERATION_FAILED;
 
 @Component
 @RequiredArgsConstructor
@@ -18,6 +22,7 @@ public class VideoInteractorImpl implements VideoInteractor {
 
     private final SourceService sourceService;
     private final VideoService videoService;
+    private final ModerationService moderationService;
 
     @Override
     public NewVideoResponse postApiVideosNew(String prototype, User user) {
@@ -39,9 +44,14 @@ public class VideoInteractorImpl implements VideoInteractor {
     }
 
     @Override
-    public GetStatusResponse getApiVideosStatus(String sourceId, User user) {
-        GetStatusResponse response = new GetStatusResponse();
-        response.setStatus(videoService.getVideoStatus(sourceId, user.getUsername()));
+    public GetVideoStatusResponse getApiVideosStatus(String sourceId, User user) {
+        VideoStatus status = videoService.getVideoStatus(sourceId, user.getUsername());
+
+        GetVideoStatusResponse response = new GetVideoStatusResponse();
+        response.setStatus(status);
+        if (status == MODERATION_FAILED) {
+            response.setComment(moderationService.getModerationComment(sourceId));
+        }
         return response;
     }
 

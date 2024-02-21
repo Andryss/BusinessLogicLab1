@@ -1,9 +1,7 @@
 package ru.andryss.rutube.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.andryss.rutube.service.SourceService;
@@ -14,7 +12,7 @@ public class SourceController {
 
     private final SourceService sourceService;
 
-    @PutMapping("/api/sources/{sourceId}")
+    @PutMapping(value = "/api/sources/{sourceId}", consumes = "multipart/form-data")
     public ResponseEntity<?> putApiSources(
             @PathVariable String sourceId,
             @RequestParam MultipartFile file
@@ -23,7 +21,7 @@ public class SourceController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/api/sources/{sourceId}")
+    @GetMapping(value = "/api/sources/{sourceId}", produces = "video/mp4")
     public ResponseEntity<?> getApiSources(
             @PathVariable String sourceId
     ) {

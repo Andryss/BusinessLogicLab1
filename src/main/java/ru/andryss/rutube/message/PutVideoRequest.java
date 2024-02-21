@@ -12,7 +12,7 @@ import java.time.Instant;
 @Data
 public class PutVideoRequest {
     @NotBlank
-    @Size(max = 100)
+    @Size(min = 1, max = 100)
     String title;
     @NotNull
     @Size(max = 5000)

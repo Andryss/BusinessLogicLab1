@@ -4,6 +4,7 @@ import lombok.Data;
 import ru.andryss.rutube.model.VideoStatus;
 
 @Data
-public class GetStatusResponse {
+public class GetVideoStatusResponse {
     VideoStatus status;
+    String comment;
 }
