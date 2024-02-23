@@ -58,10 +58,10 @@ components:
       type: boolean
       description: Флаг отключения комментариев под видео
 
-    publication:
+    publishedAt:
       type: integer
       format: int64
-      description: Время отложенной публикации видео
+      description: Время публикации видео
 
     status:
       type: string
@@ -114,6 +114,26 @@ components:
         uploadLink:
           $ref: "#/components/schemas/uploadLink"
 
+    VideoThumbInfo:
+      type: object
+      properties:
+        videoId:
+          $ref: "#/components/schemas/sourceId"
+        title:
+          $ref: "#/components/schemas/title"
+        category:
+          $ref: "#/components/schemas/category"
+        publishedAt:
+          $ref: "#/components/schemas/publishedAt"
+
+    GetVideosResponse:
+      type: object
+      properties:
+        videos:
+          type: array
+          items:
+            $ref: "#/components/schemas/VideoThumbInfo"
+
     PutVideoRequest:
       type: object
       properties:
@@ -129,8 +149,6 @@ components:
           $ref: "#/components/schemas/ageRestriction"
         comments:
           $ref: "#/components/schemas/comments"
-        publication:
-          $ref: "#/components/schemas/publication"
 
     GetVideoStatusResponse:
       type: object
@@ -237,6 +255,19 @@ paths:
                 $ref: "#/components/schemas/NewVideoResponse"
         401:
           description: UNAUTHORIZED
+
+  /api/videos:
+    get:
+      summary: Получение опубликованных видео
+      tags:
+        - video
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetVideosResponse"
 
   /api/videos/{sourceId}:
     put:

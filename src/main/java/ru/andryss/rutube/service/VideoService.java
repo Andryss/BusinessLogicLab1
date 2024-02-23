@@ -1,9 +1,12 @@
 package ru.andryss.rutube.service;
 
+import ru.andryss.rutube.message.VideoThumbInfo;
 import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.model.VideoAccess;
 import ru.andryss.rutube.model.VideoCategory;
 import ru.andryss.rutube.model.VideoStatus;
+
+import java.util.List;
 
 /**
  * Service for working with videos
@@ -23,9 +26,9 @@ public interface VideoService {
      *
      * @param sourceId video to put info
      * @param author putting user
-     * @param videoInfo video info to put
+     * @param videoChangeInfo video info to put
      */
-    void putVideo(String sourceId, String author, VideoInfo videoInfo);
+    void putVideo(String sourceId, String author, VideoChangeInfo videoChangeInfo);
 
     /**
      * Returns status of given video
@@ -45,6 +48,13 @@ public interface VideoService {
     void publishVideo(String sourceId, String author);
 
     /**
+     * Finds published videos
+     *
+     * @return published videos
+     */
+    List<VideoThumbInfo> getPublishedVideos();
+
+    /**
      * Finds published video
      *
      * @param sourceId video to search
@@ -52,6 +62,6 @@ public interface VideoService {
      */
     Video findPublishedVideo(String sourceId);
 
-    record VideoInfo(String title, String description, VideoCategory category, VideoAccess access,
-                     Boolean ageRestriction, Boolean comments) { }
+    record VideoChangeInfo(String title, String description, VideoCategory category, VideoAccess access,
+                           Boolean ageRestriction, Boolean comments) { }
 }

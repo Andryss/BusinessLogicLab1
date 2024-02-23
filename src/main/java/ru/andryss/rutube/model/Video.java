@@ -41,4 +41,6 @@ public class Video {
     Instant createdAt;
 
     Instant updatedAt;
+
+    Instant publishedAt;
 }
