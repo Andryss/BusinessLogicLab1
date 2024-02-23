@@ -86,7 +86,7 @@ components:
 
     author:
       type: string
-      description: Автор комментария
+      description: Автор
 
     reaction:
       type: string
@@ -119,6 +119,8 @@ components:
       properties:
         videoId:
           $ref: "#/components/schemas/sourceId"
+        author:
+          $ref: "#/components/schemas/author"
         title:
           $ref: "#/components/schemas/title"
         category:
@@ -133,6 +135,26 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/VideoThumbInfo"
+
+    GetVideoResponse:
+      type: object
+      properties:
+        downloadLink:
+          $ref: "#/components/schemas/downloadLink"
+        author:
+          $ref: "#/components/schemas/author"
+        title:
+          $ref: "#/components/schemas/title"
+        description:
+          $ref: "#/components/schemas/description"
+        category:
+          $ref: "#/components/schemas/category"
+        ageRestriction:
+          $ref: "#/components/schemas/ageRestriction"
+        comments:
+          $ref: "#/components/schemas/comments"
+        publishedAt:
+          $ref: "#/components/schemas/publishedAt"
 
     PutVideoRequest:
       type: object
@@ -270,6 +292,26 @@ paths:
                 $ref: "#/components/schemas/GetVideosResponse"
 
   /api/videos/{sourceId}:
+    get:
+      summary: Получение подробной информации об опубликованном видео
+      tags:
+        - video
+      parameters:
+        - in: path
+          name: sourceId
+          description: Идентификатор видео (контента)
+          required: true
+          schema:
+            $ref: "#/components/schemas/sourceId"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetVideoResponse"
+        404:
+          description: NOT FOUND
     put:
       summary: Заполнение данных о видео
       tags:

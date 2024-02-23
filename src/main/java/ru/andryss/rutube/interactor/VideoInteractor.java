@@ -1,10 +1,7 @@
 package ru.andryss.rutube.interactor;
 
 import org.springframework.security.core.userdetails.User;
-import ru.andryss.rutube.message.GetVideoStatusResponse;
-import ru.andryss.rutube.message.GetVideosResponse;
-import ru.andryss.rutube.message.NewVideoResponse;
-import ru.andryss.rutube.message.PutVideoRequest;
+import ru.andryss.rutube.message.*;
 
 /**
  * Interactor for handling video requests
@@ -18,6 +15,10 @@ public interface VideoInteractor {
      * Handles GET /api/videos request
      */
     GetVideosResponse getApiVideos();
+    /**
+     * Handles GET /api/video/{sourceId} request
+     */
+    GetVideoResponse getApiVideo(String sourceId);
     /**
      * Handles PUT /api/videos/{sourceId} request
      */

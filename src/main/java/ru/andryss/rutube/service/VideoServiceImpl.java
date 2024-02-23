@@ -100,6 +100,7 @@ public class VideoServiceImpl implements VideoService {
         for (Video video : published) {
             VideoThumbInfo info = new VideoThumbInfo();
             info.setVideoId(video.getSourceId());
+            info.setAuthor(video.getAuthor());
             info.setTitle(video.getTitle());
             info.setCategory(video.getCategory());
             info.setPublishedAt(video.getPublishedAt());

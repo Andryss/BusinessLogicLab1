@@ -3,10 +3,8 @@ package ru.andryss.rutube.interactor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
-import ru.andryss.rutube.message.GetVideoStatusResponse;
-import ru.andryss.rutube.message.GetVideosResponse;
-import ru.andryss.rutube.message.NewVideoResponse;
-import ru.andryss.rutube.message.PutVideoRequest;
+import ru.andryss.rutube.message.*;
+import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.model.VideoStatus;
 import ru.andryss.rutube.service.ModerationService;
 import ru.andryss.rutube.service.SourceService;
@@ -41,6 +39,24 @@ public class VideoInteractorImpl implements VideoInteractor {
     public GetVideosResponse getApiVideos() {
         GetVideosResponse response = new GetVideosResponse();
         response.setVideos(videoService.getPublishedVideos());
+        return response;
+    }
+
+    @Override
+    public GetVideoResponse getApiVideo(String sourceId) {
+        Video video = videoService.findPublishedVideo(sourceId);
+        String downloadLink = sourceService.generateDownloadLink(sourceId);
+
+        GetVideoResponse response = new GetVideoResponse();
+        response.setDownloadLink(downloadLink);
+        response.setAuthor(video.getAuthor());
+        response.setTitle(video.getTitle());
+        response.setDescription(video.getDescription());
+        response.setCategory(video.getCategory());
+        response.setAgeRestriction(video.isAgeRestriction());
+        response.setComments(video.isComments());
+        response.setPublishedAt(video.getPublishedAt());
+
         return response;
     }
 

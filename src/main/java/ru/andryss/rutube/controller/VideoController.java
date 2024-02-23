@@ -31,6 +31,13 @@ public class VideoController {
         return ResponseEntity.ok(interactor.getApiVideos());
     }
 
+    @GetMapping("/api/videos/{sourceId}")
+    public ResponseEntity<?> getApiVideo(
+            @PathVariable @UUID String sourceId
+    ) {
+        return ResponseEntity.ok(interactor.getApiVideo(sourceId));
+    }
+
     @PutMapping("/api/videos/{sourceId}")
     public ResponseEntity<?> putApiVideos(
             @PathVariable @UUID String sourceId,

@@ -6,10 +6,13 @@ import ru.andryss.rutube.model.VideoCategory;
 import java.time.Instant;
 
 @Data
-public class VideoThumbInfo {
-    String videoId;
+public class GetVideoResponse {
+    String downloadLink;
     String author;
     String title;
+    String description;
     VideoCategory category;
+    boolean ageRestriction;
+    boolean comments;
     Instant publishedAt;
 }
