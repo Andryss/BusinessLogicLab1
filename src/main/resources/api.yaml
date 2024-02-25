@@ -14,12 +14,12 @@ components:
 
     uploadLink:
       type: string
-      description: Ссылка для загрузки (upload)
+      description: Ссылка для загрузки (PUT по ссылке)
       example: https://example.site/upload/link
 
     downloadLink:
       type: string
-      description: Ссылка для загрузки (download)
+      description: Ссылка для загрузки (GET по ссылке)
       example: https://example.site/download/link
 
     title:
@@ -104,7 +104,19 @@ components:
 
     comment:
       type: string
-      description: Комментарий к результату модерации
+      description: Комментарий к результату
+
+    pageNumber:
+      type: integer
+      format: int32
+      description: Номер страницы (параметр пагинации)
+      default: 0
+
+    pageSize:
+      type: integer
+      format: int32
+      description: Размер страницы (параметр пагинации)
+      default: 1
 
     NewVideoResponse:
       type: object
@@ -283,6 +295,17 @@ paths:
       summary: Получение опубликованных видео
       tags:
         - video
+      parameters:
+        - in: query
+          name: pageNumber
+          description: Номер страницы (параметр пагинации)
+          schema:
+            $ref: "#/components/schemas/pageNumber"
+        - in: query
+          name: pageSize
+          description: Размер страницы (параметр пагинации)
+          schema:
+            $ref: "#/components/schemas/pageSize"
       responses:
         200:
           description: OK
@@ -290,6 +313,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetVideosResponse"
+        400:
+          description: BAD REQUEST
 
   /api/videos/{sourceId}:
     get:
@@ -312,6 +337,7 @@ paths:
                 $ref: "#/components/schemas/GetVideoResponse"
         404:
           description: NOT FOUND
+
     put:
       summary: Заполнение данных о видео
       tags:
@@ -397,6 +423,8 @@ paths:
       responses:
         204:
           description: NO CONTENT
+        400:
+          description: BAD REQUEST
         401:
           description: UNAUTHORIZED
         404:
@@ -412,9 +440,23 @@ paths:
         - in: query
           name: sourceId
           description: Идентификатор контента
-          required: true
           schema:
             $ref: "#/components/schemas/sourceId"
+        - in: query
+          name: parentId
+          description: Идентификатор родительского комментария
+          schema:
+            $ref: "#/components/schemas/commentId"
+        - in: query
+          name: pageNumber
+          description: Номер страницы (параметр пагинации)
+          schema:
+            $ref: "#/components/schemas/pageNumber"
+        - in: query
+          name: pageSize
+          description: Размер страницы (параметр пагинации)
+          schema:
+            $ref: "#/components/schemas/pageSize"
       responses:
         200:
           description: OK
@@ -422,10 +464,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetCommentsResponse"
-        401:
-          description: UNAUTHORIZED
+        400:
+          description: BAD REQUEST
         404:
           description: NOT FOUND
+        409:
+          description: CONFLICT
 
   /api/reactions:
     post:
@@ -440,12 +484,12 @@ paths:
       responses:
         204:
           description: NO CONTENT
+        400:
+          description: BAD REQUEST
         401:
           description: UNAUTHORIZED
         404:
           description: NOT FOUND
-        409:
-          description: CONFLICT
 
     get:
       summary: Получение реакций под контентом
@@ -524,6 +568,8 @@ paths:
       responses:
         204:
           description: NO CONTENT
+        400:
+          description: BAD REQUEST
         401:
           description: UNAUTHORIZED
         403:
