@@ -118,6 +118,11 @@ components:
       description: Размер страницы (параметр пагинации)
       default: 1
 
+    file:
+      type: string
+      format: binary
+      description: Видео
+
     NewVideoResponse:
       type: object
       properties:
@@ -272,6 +277,12 @@ components:
           $ref: "#/components/schemas/result"
         comment:
           $ref: "#/components/schemas/comment"
+
+    PutSourceRequest:
+      type: object
+      properties:
+        file:
+          $ref: "#/components/schemas/file"
 
 
 paths:
@@ -440,6 +451,7 @@ paths:
         - in: query
           name: sourceId
           description: Идентификатор контента
+          required: true
           schema:
             $ref: "#/components/schemas/sourceId"
         - in: query
@@ -509,6 +521,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetReactionsResponse"
+        400:
+          description: BAD REQUEST
         401:
           description: UNAUTHORIZED
         404:
@@ -533,6 +547,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetMyReactionResponse"
+        400:
+          description: BAD REQUEST
         401:
           description: UNAUTHORIZED
         404:
@@ -577,3 +593,52 @@ paths:
         404:
           description: NOT FOUND
 
+  /api/source/{sourceId}:
+    put:
+      summary: Загрузка ресурса
+      tags:
+        - source
+      parameters:
+        - in: path
+          name: sourceId
+          description: Идентификатор ресурса
+          required: true
+          schema:
+            $ref: "#/components/schemas/sourceId"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PutSourceRequest"
+      responses:
+        204:
+          description: NO CONTENT
+        400:
+          description: BAD REQUEST
+        401:
+          description: UNAUTHORIZED
+        404:
+          description: NOT FOUND
+        409:
+          description: CONFLICT
+
+    get:
+      summary: Загрузка ресурса
+      tags:
+        - source
+      parameters:
+        - in: path
+          name: sourceId
+          description: Идентификатор ресурса
+          required: true
+          schema:
+            $ref: "#/components/schemas/sourceId"
+      responses:
+        200:
+          description: OK
+          content:
+            video/mp4:
+              schema:
+                $ref: "#/components/schemas/file"
+        404:
+          description: NOT FOUND
