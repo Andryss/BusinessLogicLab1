@@ -1,5 +1,6 @@
 package ru.andryss.rutube.service;
 
+import org.springframework.data.domain.PageRequest;
 import ru.andryss.rutube.message.CommentInfo;
 
 import java.util.List;
@@ -24,5 +25,5 @@ public interface CommentService {
      * @param sourceId source to search
      * @return list of root comments
      */
-    List<CommentInfo> getComments(String sourceId);
+    List<CommentInfo> getComments(String sourceId, String parentId, PageRequest pageRequest);
 }

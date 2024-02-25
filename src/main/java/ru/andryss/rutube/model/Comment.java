@@ -23,5 +23,6 @@ public class Comment {
     String parent;
     String content;
     String author;
+    int replies;
     Instant createdAt;
 }

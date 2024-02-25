@@ -1,15 +1,20 @@
 package ru.andryss.rutube.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.UUID;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.andryss.rutube.interactor.VideoInteractor;
-import ru.andryss.rutube.message.PutVideoRequest;
+import ru.andryss.rutube.message.*;
+
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 @Validated
 @RestController
@@ -19,49 +24,56 @@ public class VideoController {
     private final VideoInteractor interactor;
 
     @PostMapping("/api/videos:new")
-    public ResponseEntity<?> postApiVideosNew(
+    @ResponseStatus(OK)
+    public NewVideoResponse postApiVideosNew(
             @RequestParam(required = false) String prototype,
             @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok(interactor.postApiVideosNew(prototype, user));
+        return interactor.postApiVideosNew(prototype, user);
     }
 
     @GetMapping("/api/videos")
-    public ResponseEntity<?> getApiVideos() {
-        return ResponseEntity.ok(interactor.getApiVideos());
+    @ResponseStatus(OK)
+    public GetVideosResponse getApiVideos(
+            @RequestParam(defaultValue = "0") @PositiveOrZero int pageNumber,
+            @RequestParam(defaultValue = "1") @Positive int pageSize
+    ) {
+        return interactor.getApiVideos(PageRequest.of(pageNumber, pageSize));
     }
 
     @GetMapping("/api/videos/{sourceId}")
-    public ResponseEntity<?> getApiVideo(
-            @PathVariable @UUID String sourceId
+    @ResponseStatus(OK)
+    public GetVideoResponse getApiVideo(
+            @PathVariable String sourceId
     ) {
-        return ResponseEntity.ok(interactor.getApiVideo(sourceId));
+        return interactor.getApiVideo(sourceId);
     }
 
     @PutMapping("/api/videos/{sourceId}")
-    public ResponseEntity<?> putApiVideos(
-            @PathVariable @UUID String sourceId,
+    @ResponseStatus(NO_CONTENT)
+    public void putApiVideos(
+            @PathVariable String sourceId,
             @RequestBody @Valid PutVideoRequest request,
             @AuthenticationPrincipal User user
     ) {
         interactor.putApiVideos(sourceId, request, user);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/api/videos/{sourceId}/status")
-    public ResponseEntity<?> getApiVideosStatus(
-            @PathVariable @UUID String sourceId,
+    @ResponseStatus(OK)
+    public GetVideoStatusResponse getApiVideosStatus(
+            @PathVariable @NotBlank String sourceId,
             @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok(interactor.getApiVideosStatus(sourceId, user));
+        return interactor.getApiVideosStatus(sourceId, user);
     }
 
     @PostMapping("/api/videos/{sourceId}:publish")
-    public ResponseEntity<?> postApiVideosPublish(
-            @PathVariable @UUID String sourceId,
+    @ResponseStatus(NO_CONTENT)
+    public void postApiVideosPublish(
+            @PathVariable @NotBlank String sourceId,
             @AuthenticationPrincipal User user
     ) {
         interactor.postApiVideosPublish(sourceId, user);
-        return ResponseEntity.noContent().build();
     }
 }

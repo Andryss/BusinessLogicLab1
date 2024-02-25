@@ -2,6 +2,8 @@ package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.andryss.rutube.exception.IncorrectVideoStatusException;
 import ru.andryss.rutube.exception.SourceNotFoundException;
 import ru.andryss.rutube.exception.VideoNotFoundException;
@@ -25,6 +27,7 @@ public class ModerationServiceImpl implements ModerationService {
     private final VideoRepository videoRepository;
 
     @Override
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Optional<String> getNextModeration(String username) {
         Optional<String> alreadyAssigned = requestRepository.findByAssignee(username).map(ModerationRequest::getSourceId);
         if (alreadyAssigned.isPresent()) {

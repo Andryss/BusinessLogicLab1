@@ -1,6 +1,7 @@
 package ru.andryss.rutube.interactor;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import ru.andryss.rutube.message.CreateCommentRequest;
@@ -19,9 +20,9 @@ public class CommentInteractorImpl implements CommentInteractor {
     }
 
     @Override
-    public GetCommentsResponse getApiComments(String sourceId) {
+    public GetCommentsResponse getApiComments(String sourceId, String parentId, PageRequest pageRequest) {
         GetCommentsResponse response = new GetCommentsResponse();
-        response.setComments(commentService.getComments(sourceId));
+        response.setComments(commentService.getComments(sourceId, parentId, pageRequest));
         return response;
     }
 }

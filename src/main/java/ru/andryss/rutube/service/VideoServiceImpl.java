@@ -1,6 +1,7 @@
 package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.andryss.rutube.exception.VideoAlreadyPublishedException;
 import ru.andryss.rutube.exception.VideoNotFoundException;
@@ -93,8 +94,8 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public List<VideoThumbInfo> getPublishedVideos() {
-        List<Video> published = videoRepository.findAllPublished();
+    public List<VideoThumbInfo> getPublishedVideos(PageRequest pageRequest) {
+        List<Video> published = videoRepository.findAllPublished(pageRequest);
         List<VideoThumbInfo> infoList = new ArrayList<>(published.size());
 
         for (Video video : published) {

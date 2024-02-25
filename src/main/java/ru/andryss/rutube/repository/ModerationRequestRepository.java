@@ -3,7 +3,6 @@ package ru.andryss.rutube.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional;
 import ru.andryss.rutube.model.ModerationRequest;
 
 import java.time.Instant;
@@ -13,7 +12,6 @@ public interface ModerationRequestRepository extends JpaRepository<ModerationReq
     Optional<ModerationRequest> findByAssignee(String username);
 
     @Modifying
-    @Transactional
     @Query(value = """
         update moderation_requests
         set assignee = :username, assigned_at = :assignedAt

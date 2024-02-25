@@ -1,6 +1,7 @@
 package ru.andryss.rutube.interactor;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import ru.andryss.rutube.message.*;
@@ -36,9 +37,9 @@ public class VideoInteractorImpl implements VideoInteractor {
     }
 
     @Override
-    public GetVideosResponse getApiVideos() {
+    public GetVideosResponse getApiVideos(PageRequest pageRequest) {
         GetVideosResponse response = new GetVideosResponse();
-        response.setVideos(videoService.getPublishedVideos());
+        response.setVideos(videoService.getPublishedVideos(pageRequest));
         return response;
     }
 
@@ -62,8 +63,8 @@ public class VideoInteractorImpl implements VideoInteractor {
 
     @Override
     public void putApiVideos(String sourceId, PutVideoRequest request, User user) {
-        VideoChangeInfo videoChangeInfo = new VideoChangeInfo(request.getTitle(), request.getDescription(), request.getCategory(),
-                request.getAccess(), request.isAgeRestriction(), request.isComments());
+        VideoChangeInfo videoChangeInfo = new VideoChangeInfo(request.getTitle().trim(), request.getDescription().trim(),
+                request.getCategory(), request.getAccess(), request.isAgeRestriction(), request.isComments());
         videoService.putVideo(sourceId, user.getUsername(), videoChangeInfo);
     }
 

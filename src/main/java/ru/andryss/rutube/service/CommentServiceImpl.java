@@ -1,6 +1,7 @@
 package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.andryss.rutube.exception.CommentNotFoundException;
 import ru.andryss.rutube.exception.CommentsDisableException;
@@ -12,9 +13,9 @@ import ru.andryss.rutube.repository.CommentRepository;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static org.springframework.data.domain.Sort.by;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,8 @@ public class CommentServiceImpl implements CommentService {
             if (!parent.getSourceId().equals(sourceId)) {
                 throw new ParentSourceDifferentException(parentId);
             }
+            parent.setReplies(parent.getReplies() + 1);
+            commentRepository.save(parent);
         }
 
         Comment comment = new Comment();
@@ -48,38 +51,34 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentInfo> getComments(String sourceId) {
+    public List<CommentInfo> getComments(String sourceId, String parentId, PageRequest pageRequest) {
         Video video = videoService.findPublishedVideo(sourceId);
         if (!video.isComments()) {
             throw new CommentsDisableException(sourceId);
         }
 
-        List<Comment> comments = commentRepository.findAllBySourceIdOrderByCreatedAt(sourceId);
+        PageRequest page = pageRequest.withSort(by("createdAt"));
+        List<Comment> comments;
+        if (parentId == null) {
+            comments = commentRepository.findAllBySourceId(sourceId, page);
+        } else {
+            if (!commentRepository.existsBySourceIdAndParent(sourceId, parentId)) {
+                throw new CommentNotFoundException(parentId);
+            }
+            comments = commentRepository.findAllBySourceIdAndParent(sourceId, parentId, page);
+        }
 
-        Map<String, CommentInfo> infoById = new HashMap<>();
-        Map<String, List<String>> childrenIdsById = new HashMap<>();
-
-        comments.forEach(comment -> {
+        List<CommentInfo> commentInfos = new ArrayList<>(comments.size());
+        for (Comment comment : comments) {
             CommentInfo info = new CommentInfo();
             info.setCommentId(comment.getId());
             info.setAuthor(comment.getAuthor());
             info.setContent(comment.getContent());
+            info.setReplies(comment.getReplies());
             info.setPostedAt(comment.getCreatedAt());
+            commentInfos.add(info);
+        }
 
-            infoById.put(comment.getId(), info);
-            childrenIdsById.computeIfAbsent(comment.getParent(), s -> new ArrayList<>()).add(comment.getId());
-        });
-
-        List<CommentInfo> rootComments = new ArrayList<>();
-        childrenIdsById.getOrDefault(null, List.of()).forEach(id -> rootComments.add(constructCommentInfo(id, infoById, childrenIdsById)));
-        return rootComments;
-    }
-
-    private CommentInfo constructCommentInfo(String commentId, Map<String, CommentInfo> infoById, Map<String, List<String>> childrenIdsById) {
-        ArrayList<CommentInfo> children = new ArrayList<>();
-        childrenIdsById.getOrDefault(commentId, List.of()).forEach(id -> children.add(constructCommentInfo(id, infoById, childrenIdsById)));
-        CommentInfo info = infoById.get(commentId);
-        info.setChildren(children);
-        return info;
+        return commentInfos;
     }
 }

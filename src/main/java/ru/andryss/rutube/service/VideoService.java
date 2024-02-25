@@ -1,5 +1,6 @@
 package ru.andryss.rutube.service;
 
+import org.springframework.data.domain.PageRequest;
 import ru.andryss.rutube.message.VideoThumbInfo;
 import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.model.VideoAccess;
@@ -52,7 +53,7 @@ public interface VideoService {
      *
      * @return published videos
      */
-    List<VideoThumbInfo> getPublishedVideos();
+    List<VideoThumbInfo> getPublishedVideos(PageRequest pageRequest);
 
     /**
      * Finds published video

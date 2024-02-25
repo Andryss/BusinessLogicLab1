@@ -39,24 +39,19 @@ public class SourceServiceImpl implements SourceService {
     @Override
     public void putVideo(String sourceId, MultipartFile file) {
         if (!uploadLinks.contains(sourceId)) {
-            throw new LinkNotFountException(sourceId);
+            throw new LinkNotFoundException(sourceId);
         }
 
-        if (file.getContentType() == null) {
-            throw new IllegalVideoException();
-        }
-        if (!file.getContentType().equals("video/mp4")) {
-            throw new IllegalVideoException();
-        }
-        if (file.getSize() <= 0 || file.getSize() > 10 * 1024 * 1024) {
-            throw new IllegalVideoException();
+        if (file.getContentType() == null || !file.getContentType().equals("video/mp4") ||
+                file.getSize() <= 0 || file.getSize() > 2 * 1024 * 1024) {
+            throw new IllegalVideoFormatException();
         }
 
         byte[] content;
         try {
             content = file.getBytes();
         } catch (IOException e) {
-            throw new IllegalVideoException();
+            throw new IllegalVideoFormatException();
         }
 
         Video video = videoRepository.findById(sourceId).orElseThrow(() -> new VideoNotFoundException(sourceId));
@@ -89,7 +84,7 @@ public class SourceServiceImpl implements SourceService {
     @Override
     public byte[] getVideo(String sourceId) {
         if (!downloadLinks.contains(sourceId)) {
-            throw new LinkNotFountException(sourceId);
+            throw new LinkNotFoundException(sourceId);
         }
 
         Source source = sourceRepository.findById(sourceId).orElseThrow(() -> new SourceNotFoundException(sourceId));

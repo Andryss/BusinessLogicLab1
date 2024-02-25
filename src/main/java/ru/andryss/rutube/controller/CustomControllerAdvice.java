@@ -1,75 +1,95 @@
 package ru.andryss.rutube.controller;
 
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.andryss.rutube.exception.*;
 import ru.andryss.rutube.message.ErrorMessage;
 
+import static org.springframework.http.HttpStatus.*;
+
+@ResponseBody
 @ControllerAdvice
 public class CustomControllerAdvice {
 
     @ExceptionHandler({ConstraintViolationException.class, HttpMessageNotReadableException.class})
-    ResponseEntity<?> handleBadRequest(Exception e) {
-        return handleError(HttpStatus.BAD_REQUEST, e.getMessage());
+    @ResponseStatus(BAD_REQUEST)
+    ErrorMessage handleBadRequest(Exception e) {
+        return new ErrorMessage(e.getMessage());
+    }
+    
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(BAD_REQUEST)
+    ErrorMessage handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+        Object[] messageArguments = e.getDetailMessageArguments();
+        if (messageArguments == null) {
+            return new ErrorMessage(e.getMessage());
+        }
+        return new ErrorMessage((String) e.getDetailMessageArguments()[1]);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    ResponseEntity<?> handleMissingServletRequestParameter(MissingServletRequestParameterException e) {
-        return handleError(HttpStatus.BAD_REQUEST, String.format("request parameter %s is missing", e.getParameterName()));
+    @ResponseStatus(BAD_REQUEST)
+    ErrorMessage handleMissingServletRequestParameter(MissingServletRequestParameterException e) {
+        return new ErrorMessage(String.format("request parameter %s is missing", e.getParameterName()));
     }
 
-    @ExceptionHandler(IllegalVideoException.class)
-    ResponseEntity<?> handleIllegalVideo() {
-        return handleError(HttpStatus.BAD_REQUEST, "wrong video format");
+    @ExceptionHandler(IllegalVideoFormatException.class)
+    @ResponseStatus(BAD_REQUEST)
+    ErrorMessage handleIllegalVideo() {
+        return new ErrorMessage("wrong video format");
     }
 
     @ExceptionHandler(VideoNotFoundException.class)
-    ResponseEntity<?> handleVideoNotFound(VideoNotFoundException e) {
-        return handleError(HttpStatus.NOT_FOUND, String.format("video %s not found", e.getMessage()));
+    @ResponseStatus(NOT_FOUND)
+    ErrorMessage handleVideoNotFound(VideoNotFoundException e) {
+        return new ErrorMessage(String.format("video %s not found", e.getMessage()));
     }
 
     @ExceptionHandler(SourceNotFoundException.class)
-    ResponseEntity<?> handleSourceNotFound(SourceNotFoundException e) {
-        return handleError(HttpStatus.NOT_FOUND, String.format("source %s not found", e.getMessage()));
+    @ResponseStatus(NOT_FOUND)
+    ErrorMessage handleSourceNotFound(SourceNotFoundException e) {
+        return new ErrorMessage(String.format("source %s not found", e.getMessage()));
     }
 
-    @ExceptionHandler(LinkNotFountException.class)
-    ResponseEntity<?> handleLinkNotFount(LinkNotFountException e) {
-        return handleError(HttpStatus.NOT_FOUND, String.format("link for id %s not found", e.getMessage()));
+    @ExceptionHandler(LinkNotFoundException.class)
+    @ResponseStatus(NOT_FOUND)
+    ErrorMessage handleLinkNotFount(LinkNotFoundException e) {
+        return new ErrorMessage(String.format("link for id %s not found", e.getMessage()));
     }
 
     @ExceptionHandler(IncorrectVideoStatusException.class)
-    ResponseEntity<?> handleIncorrectVideoStatus(IncorrectVideoStatusException e) {
-        return handleError(HttpStatus.CONFLICT, String.format("video has status %s but expected %s", e.getReal(), e.getExpected()));
+    @ResponseStatus(CONFLICT)
+    ErrorMessage handleIncorrectVideoStatus(IncorrectVideoStatusException e) {
+        return new ErrorMessage(String.format("video has status %s but expected %s", e.getReal(), e.getExpected()));
     }
 
     @ExceptionHandler(VideoAlreadyPublishedException.class)
-    ResponseEntity<?> handleVideoAlreadyPublished(VideoAlreadyPublishedException e) {
-        return handleError(HttpStatus.CONFLICT, String.format("video %s has already published", e.getMessage()));
+    @ResponseStatus(CONFLICT)
+    ErrorMessage handleVideoAlreadyPublished(VideoAlreadyPublishedException e) {
+        return new ErrorMessage(String.format("video %s has already published", e.getMessage()));
     }
 
     @ExceptionHandler(CommentsDisableException.class)
-    ResponseEntity<?> handleCommentsDisable(CommentsDisableException e) {
-        return handleError(HttpStatus.CONFLICT, String.format("comments on video %s are disabled", e.getMessage()));
+    @ResponseStatus(CONFLICT)
+    ErrorMessage handleCommentsDisable(CommentsDisableException e) {
+        return new ErrorMessage(String.format("comments on video %s are disabled", e.getMessage()));
     }
 
     @ExceptionHandler(ParentSourceDifferentException.class)
-    ResponseEntity<?> handleParentSourceDifferent(ParentSourceDifferentException e) {
-        return handleError(HttpStatus.CONFLICT, String.format("parent video %s has different sourceId", e.getMessage()));
+    @ResponseStatus(CONFLICT)
+    ErrorMessage handleParentSourceDifferent(ParentSourceDifferentException e) {
+        return new ErrorMessage(String.format("parent video %s has different sourceId", e.getMessage()));
     }
 
     @ExceptionHandler(CommentNotFoundException.class)
-    ResponseEntity<?> handleCommentNotFound(CommentNotFoundException e) {
-        return handleError(HttpStatus.NOT_FOUND, String.format("comment %s not found", e.getMessage()));
+    @ResponseStatus(NOT_FOUND)
+    ErrorMessage handleCommentNotFound(CommentNotFoundException e) {
+        return new ErrorMessage(String.format("comment %s not found", e.getMessage()));
     }
-
-    ResponseEntity<?> handleError(HttpStatus status, String message) {
-        return ResponseEntity.status(status).body(new ErrorMessage(message));
-    }
-
 }

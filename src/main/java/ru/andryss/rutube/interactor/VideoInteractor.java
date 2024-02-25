@@ -1,5 +1,6 @@
 package ru.andryss.rutube.interactor;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.User;
 import ru.andryss.rutube.message.*;
 
@@ -14,7 +15,7 @@ public interface VideoInteractor {
     /**
      * Handles GET /api/videos request
      */
-    GetVideosResponse getApiVideos();
+    GetVideosResponse getApiVideos(PageRequest pageRequest);
     /**
      * Handles GET /api/video/{sourceId} request
      */
