@@ -12,9 +12,6 @@ import ru.andryss.rutube.message.CreateReactionRequest;
 import ru.andryss.rutube.message.GetMyReactionResponse;
 import ru.andryss.rutube.message.GetReactionsResponse;
 
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
-
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +20,6 @@ public class ReactionController {
     private final ReactionInteractor interactor;
 
     @PostMapping("/api/reactions")
-    @ResponseStatus(NO_CONTENT)
     public void postApiReactions(
             @RequestBody @Valid CreateReactionRequest request,
             @AuthenticationPrincipal User user
@@ -32,7 +28,6 @@ public class ReactionController {
     }
 
     @GetMapping("/api/reactions")
-    @ResponseStatus(OK)
     public GetReactionsResponse getApiReactions(
             @RequestParam @NotBlank String sourceId
     ) {
@@ -40,7 +35,6 @@ public class ReactionController {
     }
 
     @GetMapping("/api/reactions/my")
-    @ResponseStatus(OK)
     public GetMyReactionResponse getApiReactionsMy(
             @RequestParam @NotBlank String sourceId,
             @AuthenticationPrincipal User user

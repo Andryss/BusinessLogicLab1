@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import ru.andryss.rutube.interactor.ModerationInteractor;
 import ru.andryss.rutube.message.GetNextModerationResponse;
 import ru.andryss.rutube.message.UploadModerationResultRequest;
-
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
 @Validated
 @RestController
@@ -21,7 +21,6 @@ public class ModerationController {
     private final ModerationInteractor interactor;
 
     @GetMapping("/api/moderation/next")
-    @ResponseStatus(OK)
     public GetNextModerationResponse getApiModerationNext(
             @AuthenticationPrincipal User user
     ) {
@@ -29,7 +28,6 @@ public class ModerationController {
     }
 
     @PostMapping("/api/moderation")
-    @ResponseStatus(NO_CONTENT)
     public void postApiModeration(
             @RequestBody @Valid UploadModerationResultRequest request,
             @AuthenticationPrincipal User user

@@ -1,6 +1,7 @@
 package ru.andryss.rutube.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -14,9 +15,6 @@ import ru.andryss.rutube.interactor.CommentInteractor;
 import ru.andryss.rutube.message.CreateCommentRequest;
 import ru.andryss.rutube.message.GetCommentsResponse;
 
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
-
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +23,6 @@ public class CommentController {
     private final CommentInteractor commentInteractor;
 
     @PostMapping("/api/comments")
-    @ResponseStatus(NO_CONTENT)
     public void postApiComments(
             @RequestBody @Valid CreateCommentRequest request,
             @AuthenticationPrincipal User user
@@ -34,12 +31,11 @@ public class CommentController {
     }
 
     @GetMapping("/api/comments")
-    @ResponseStatus(OK)
     public GetCommentsResponse getApiComments(
             @RequestParam @NotBlank String sourceId,
             @RequestParam(required = false) String parentId,
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNumber,
-            @RequestParam(defaultValue = "1") @Positive int pageSize
+            @RequestParam(defaultValue = "1") @Positive @Max(100) int pageSize
     ) {
         return commentInteractor.getApiComments(sourceId, parentId, PageRequest.of(pageNumber, pageSize));
     }

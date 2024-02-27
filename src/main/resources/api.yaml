@@ -11,30 +11,34 @@ components:
       type: string
       format: uuid
       description: Идентификатор контента
+      example: "4153ca20-a15d-478e-9427-875f95c677f8"
 
     uploadLink:
       type: string
       description: Ссылка для загрузки (PUT по ссылке)
-      example: https://example.site/upload/link
+      example: "https://example.site/upload/link"
 
     downloadLink:
       type: string
       description: Ссылка для загрузки (GET по ссылке)
-      example: https://example.site/download/link
+      example: "https://example.site/download/link"
 
     title:
       type: string
       maxLength: 100
-      description: Название видео
+      description: Название
+      example: "НЕПРИМЕЧАТЕЛЬНОЕ название"
 
     description:
       type: string
       maxLength: 5000
-      description: Описание видео
+      description: Описание
+      example: "ставьте лайки пж"
+
 
     category:
       type: string
-      description: Категория видео
+      description: Категория
       enum:
         - "ANIME"
         - "FOOD"
@@ -56,16 +60,17 @@ components:
 
     comments:
       type: boolean
-      description: Флаг отключения комментариев под видео
+      description: Флаг отключения комментариев
 
     publishedAt:
       type: integer
       format: int64
-      description: Время публикации видео
+      description: Время публикации
+      example: 1709064700772
 
     status:
       type: string
-      description: Статус видео
+      description: Статус
       enum:
         - "UPLOAD_PENDING"
         - "MODERATION_PENDING"
@@ -78,15 +83,23 @@ components:
       type: string
       format: uuid
       description: Идентификатор комментария
+      example: "17c70255-2c5b-43f8-bc58-69f04af16cc5"
 
     content:
       type: string
       maxLength: 200
-      description: Содержание комментария
+      description: Содержание
+      example: "хрень переделывай"
+
+    replies:
+      type: integer
+      description: Количество ответов
+      example: 5
 
     author:
       type: string
       description: Автор
+      example: "cup_of_code"
 
     reaction:
       type: string
@@ -104,7 +117,8 @@ components:
 
     comment:
       type: string
-      description: Комментарий к результату
+      description: Комментарий
+      example: "присутствуют сцены насилия"
 
     pageNumber:
       type: integer
@@ -115,13 +129,14 @@ components:
     pageSize:
       type: integer
       format: int32
+      maximum: 100
       description: Размер страницы (параметр пагинации)
       default: 1
 
     file:
       type: string
       format: binary
-      description: Видео
+      description: Файл
 
     NewVideoResponse:
       type: object
@@ -216,10 +231,8 @@ components:
           $ref: "#/components/schemas/author"
         content:
           $ref: "#/components/schemas/content"
-        children:
-          type: array
-          items:
-            $ref: "#/components/schemas/CommentInfo"
+        replies:
+          $ref: "#/components/schemas/replies"
 
     GetCommentsResponse:
       type: object
@@ -286,11 +299,20 @@ components:
 
 
 paths:
+  # https://cloud.google.com/apis/design/custom_methods
+  # https://cloud.yandex.ru/ru/docs/compute/api-ref/
+  # https://cloud.google.com/identity-platform/docs/use-rest-api
   /api/videos:new:
     post:
       summary: Инициация создания нового видео
       tags:
         - video
+      parameters:
+        - in: query
+          name: prototype
+          description: Прототип, на основе которого заполняться данные нового видео
+          schema:
+            $ref: "#/components/schemas/sourceId"
       responses:
         200:
           description: OK
@@ -300,6 +322,8 @@ paths:
                 $ref: "#/components/schemas/NewVideoResponse"
         401:
           description: UNAUTHORIZED
+        404:
+          description: NOT FOUND
 
   /api/videos:
     get:
@@ -366,8 +390,8 @@ paths:
             schema:
               $ref: "#/components/schemas/PutVideoRequest"
       responses:
-        204:
-          description: NO CONTENT
+        200:
+          description: OK
         400:
           description: BAD REQUEST
         401:
@@ -412,8 +436,8 @@ paths:
           schema:
             $ref: "#/components/schemas/sourceId"
       responses:
-        204:
-          description: NO CONTENT
+        200:
+          description: OK
         401:
           description: UNAUTHORIZED
         404:
@@ -432,8 +456,8 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateCommentRequest"
       responses:
-        204:
-          description: NO CONTENT
+        200:
+          description: OK
         400:
           description: BAD REQUEST
         401:
@@ -494,8 +518,8 @@ paths:
             schema:
               $ref: "#/components/schemas/CreateReactionRequest"
       responses:
-        204:
-          description: NO CONTENT
+        200:
+          description: OK
         400:
           description: BAD REQUEST
         401:
@@ -582,8 +606,8 @@ paths:
             schema:
               $ref: "#/components/schemas/UploadModerationResultRequest"
       responses:
-        204:
-          description: NO CONTENT
+        200:
+          description: OK
         400:
           description: BAD REQUEST
         401:
@@ -611,8 +635,8 @@ paths:
             schema:
               $ref: "#/components/schemas/PutSourceRequest"
       responses:
-        204:
-          description: NO CONTENT
+        200:
+          description: OK
         400:
           description: BAD REQUEST
         401:
