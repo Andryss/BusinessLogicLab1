@@ -2,12 +2,16 @@ package ru.andryss.rutube.controller;
 
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.web.firewall.RequestRejectedException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import ru.andryss.rutube.exception.*;
 import ru.andryss.rutube.message.ErrorMessage;
 
@@ -17,9 +21,27 @@ import static org.springframework.http.HttpStatus.*;
 @ControllerAdvice
 public class CustomControllerAdvice {
 
-    @ExceptionHandler({ConstraintViolationException.class, HttpMessageNotReadableException.class})
+    @ExceptionHandler({
+            ConstraintViolationException.class,
+            HttpMessageNotReadableException.class,
+            MissingServletRequestPartException.class,
+            RequestRejectedException.class
+    })
     @ResponseStatus(BAD_REQUEST)
     ErrorMessage handleBadRequest(Exception e) {
+        return new ErrorMessage(e.getMessage());
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    @ResponseStatus(UNSUPPORTED_MEDIA_TYPE)
+    ErrorMessage handleUnsupportedMediaType(Exception e) {
+        return new ErrorMessage(e.getMessage());
+    }
+
+    @SuppressWarnings("deprecation")
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(REQUEST_ENTITY_TOO_LARGE)
+    ErrorMessage handleRequestEntityTooLarge(Exception e) {
         return new ErrorMessage(e.getMessage());
     }
     
