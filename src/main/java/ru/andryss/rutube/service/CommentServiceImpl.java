@@ -3,6 +3,7 @@ package ru.andryss.rutube.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 import ru.andryss.rutube.exception.CommentNotFoundException;
 import ru.andryss.rutube.exception.CommentsDisableException;
 import ru.andryss.rutube.exception.ParentSourceDifferentException;
@@ -23,31 +24,34 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final VideoService videoService;
+    private final TransactionTemplate transactionTemplate;
 
     @Override
     public void createComment(String sourceId, String author, String parentId, String content) {
-        Video video = videoService.findPublishedVideo(sourceId);
-        if (!video.isComments()) {
-            throw new CommentsDisableException(sourceId);
-        }
-
-        if (parentId != null) {
-            Comment parent = commentRepository.findById(parentId).orElseThrow(() -> new CommentNotFoundException(parentId));
-            if (!parent.getSourceId().equals(sourceId)) {
-                throw new ParentSourceDifferentException(parentId);
+        transactionTemplate.executeWithoutResult(status -> {
+            Video video = videoService.findPublishedVideo(sourceId);
+            if (!video.isComments()) {
+                throw new CommentsDisableException(sourceId);
             }
-            parent.setReplies(parent.getReplies() + 1);
-            commentRepository.save(parent);
-        }
 
-        Comment comment = new Comment();
-        comment.setSourceId(sourceId);
-        comment.setParent(parentId);
-        comment.setContent(content);
-        comment.setAuthor(author);
-        comment.setCreatedAt(Instant.now());
+            if (parentId != null) {
+                Comment parent = commentRepository.findById(parentId).orElseThrow(() -> new CommentNotFoundException(parentId));
+                if (!parent.getSourceId().equals(sourceId)) {
+                    throw new ParentSourceDifferentException(parentId);
+                }
+                parent.setReplies(parent.getReplies() + 1);
+                commentRepository.save(parent);
+            }
 
-        commentRepository.save(comment);
+            Comment comment = new Comment();
+            comment.setSourceId(sourceId);
+            comment.setParent(parentId);
+            comment.setContent(content);
+            comment.setAuthor(author);
+            comment.setCreatedAt(Instant.now());
+
+            commentRepository.save(comment);
+        });
     }
 
     @Override

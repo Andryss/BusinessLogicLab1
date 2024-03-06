@@ -2,6 +2,7 @@ package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 import ru.andryss.rutube.exception.VideoNotFoundException;
 import ru.andryss.rutube.message.ReactionInfo;
 import ru.andryss.rutube.model.Reaction;
@@ -26,22 +27,25 @@ public class ReactionServiceImpl implements ReactionService {
 
     private final VideoService videoService;
     private final ReactionRepository reactionRepository;
+    private final TransactionTemplate transactionTemplate;
 
     @Override
     public void createReaction(String sourceId, String author, ReactionType reactionType) {
-        videoService.findPublishedVideo(sourceId);
+        transactionTemplate.executeWithoutResult(status -> {
+            videoService.findPublishedVideo(sourceId);
 
-        Reaction reaction = reactionRepository.findById(new ReactionKey(sourceId, author)).orElseGet(() -> {
-            Reaction r = new Reaction();
-            r.setSourceId(sourceId);
-            r.setAuthor(author);
-            return r;
+            Reaction reaction = reactionRepository.findById(new ReactionKey(sourceId, author)).orElseGet(() -> {
+                Reaction r = new Reaction();
+                r.setSourceId(sourceId);
+                r.setAuthor(author);
+                return r;
+            });
+
+            reaction.setType(reactionType);
+            reaction.setCreatedAt(Instant.now());
+
+            reactionRepository.save(reaction);
         });
-        
-        reaction.setType(reactionType);
-        reaction.setCreatedAt(Instant.now());
-
-        reactionRepository.save(reaction);
     }
 
     @Override
