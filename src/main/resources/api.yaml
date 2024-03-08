@@ -138,6 +138,21 @@ components:
       format: binary
       description: Файл
 
+    username:
+      type: string
+      description: Имя пользователя
+      example: "cup_of_code"
+
+    password:
+      type: string
+      description: Пароль
+      example: "1234"
+
+    token:
+      type: string
+      description: Токен аутентификации
+      example: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiaWF0IjoxNzA5ODk2MTY4LCJleHAiOjE3MDk4OTc5Njh9..."
+
     NewVideoResponse:
       type: object
       properties:
@@ -297,6 +312,27 @@ components:
         file:
           $ref: "#/components/schemas/file"
 
+    AuthRequest:
+      type: object
+      properties:
+        username:
+          $ref: "#/components/schemas/username"
+        password:
+          $ref: "#/components/schemas/password"
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          $ref: "#/components/schemas/token"
+
+  securitySchemes:
+    bearerToken:
+      description: Bearer аутентификация
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
 
 paths:
   # https://cloud.google.com/apis/design/custom_methods
@@ -307,6 +343,8 @@ paths:
       summary: Инициация создания нового видео
       tags:
         - video
+      security:
+        - bearerToken: []
       parameters:
         - in: query
           name: prototype
@@ -322,6 +360,8 @@ paths:
                 $ref: "#/components/schemas/NewVideoResponse"
         401:
           description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
         404:
           description: NOT FOUND
 
@@ -330,6 +370,7 @@ paths:
       summary: Получение опубликованных видео
       tags:
         - video
+        - public
       parameters:
         - in: query
           name: pageNumber
@@ -356,6 +397,7 @@ paths:
       summary: Получение подробной информации об опубликованном видео
       tags:
         - video
+        - public
       parameters:
         - in: path
           name: sourceId
@@ -377,6 +419,8 @@ paths:
       summary: Заполнение данных о видео
       tags:
         - video
+      security:
+        - bearerToken: []
       parameters:
         - in: path
           name: sourceId
@@ -396,6 +440,8 @@ paths:
           description: BAD REQUEST
         401:
           description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
         404:
           description: NOT FOUND
 
@@ -404,6 +450,8 @@ paths:
       summary: Получение информации о статусе видео
       tags:
         - video
+      security:
+        - bearerToken: []
       parameters:
         - in: path
           name: sourceId
@@ -420,6 +468,8 @@ paths:
                 $ref: "#/components/schemas/GetVideoStatusResponse"
         401:
           description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
         404:
           description: NOT FOUND
 
@@ -428,6 +478,8 @@ paths:
       summary: Публикация видео
       tags:
         - video
+      security:
+        - bearerToken: []
       parameters:
         - in: path
           name: sourceId
@@ -440,6 +492,8 @@ paths:
           description: OK
         401:
           description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
         404:
           description: NOT FOUND
         409:
@@ -450,6 +504,8 @@ paths:
       summary: Создание комментария на контент
       tags:
         - comment
+      security:
+        - bearerToken: []
       requestBody:
         content:
           application/json:
@@ -462,6 +518,8 @@ paths:
           description: BAD REQUEST
         401:
           description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
         404:
           description: NOT FOUND
         409:
@@ -471,6 +529,7 @@ paths:
       summary: Получение комментариев под контентом
       tags:
         - comment
+        - public
       parameters:
         - in: query
           name: sourceId
@@ -512,6 +571,8 @@ paths:
       summary: Создание реакции на контент
       tags:
         - reaction
+      security:
+        - bearerToken: []
       requestBody:
         content:
           application/json:
@@ -524,6 +585,8 @@ paths:
           description: BAD REQUEST
         401:
           description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
         404:
           description: NOT FOUND
 
@@ -531,6 +594,7 @@ paths:
       summary: Получение реакций под контентом
       tags:
         - reaction
+        - public
       parameters:
         - in: query
           name: sourceId
@@ -549,6 +613,8 @@ paths:
           description: BAD REQUEST
         401:
           description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
         404:
           description: NOT FOUND
 
@@ -557,6 +623,8 @@ paths:
       summary: Получение реакции пользователя под контентом
       tags:
         - reaction
+      security:
+        - bearerToken: []
       parameters:
         - in: query
           name: sourceId
@@ -575,6 +643,8 @@ paths:
           description: BAD REQUEST
         401:
           description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
         404:
           description: NOT FOUND
 
@@ -583,6 +653,8 @@ paths:
       summary: Получение следующего контента для модерации
       tags:
         - moderation
+      security:
+        - bearerToken: []
       responses:
         200:
           description: OK
@@ -600,6 +672,8 @@ paths:
       summary: Загрузка результата модерации
       tags:
         - moderation
+      security:
+        - bearerToken: []
       requestBody:
         content:
           application/json:
@@ -622,6 +696,8 @@ paths:
       summary: Загрузка ресурса
       tags:
         - source
+      security:
+        - bearerToken: []
       parameters:
         - in: path
           name: sourceId
@@ -641,6 +717,8 @@ paths:
           description: BAD REQUEST
         401:
           description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
         404:
           description: NOT FOUND
         409:
@@ -652,6 +730,7 @@ paths:
       summary: Загрузка ресурса
       tags:
         - source
+        - public
       parameters:
         - in: path
           name: sourceId
@@ -668,3 +747,25 @@ paths:
                 $ref: "#/components/schemas/file"
         404:
           description: NOT FOUND
+
+  /api/auth/login:
+    post:
+      summary: Вход пользователя в систему
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        400:
+          description: BAD REQUEST
+        401:
+          description: UNAUTHORIZED

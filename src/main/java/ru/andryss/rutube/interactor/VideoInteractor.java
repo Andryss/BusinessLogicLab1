@@ -1,8 +1,8 @@
 package ru.andryss.rutube.interactor;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.userdetails.User;
 import ru.andryss.rutube.message.*;
+import ru.andryss.rutube.security.CustomUserDetails;
 
 /**
  * Interactor for handling video requests
@@ -11,7 +11,7 @@ public interface VideoInteractor {
     /**
      * Handles POST /api/videos:new request
      */
-    NewVideoResponse postApiVideosNew(String prototype, User user);
+    NewVideoResponse postApiVideosNew(String prototype, CustomUserDetails user);
     /**
      * Handles GET /api/videos request
      */
@@ -23,13 +23,13 @@ public interface VideoInteractor {
     /**
      * Handles PUT /api/videos/{sourceId} request
      */
-    void putApiVideos(String sourceId, PutVideoRequest request, User user);
+    void putApiVideos(String sourceId, PutVideoRequest request, CustomUserDetails user);
     /**
      * Handles GET /api/videos/{sourceId}/status request
      */
-    GetVideoStatusResponse getApiVideosStatus(String sourceId, User user);
+    GetVideoStatusResponse getApiVideosStatus(String sourceId, CustomUserDetails user);
     /**
      * Handles POST /api/videos/{sourceId}:publish request
      */
-    void postApiVideosPublish(String sourceId, User user);
+    void postApiVideosPublish(String sourceId, CustomUserDetails user);
 }

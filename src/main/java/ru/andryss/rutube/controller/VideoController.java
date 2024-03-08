@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.andryss.rutube.interactor.VideoInteractor;
 import ru.andryss.rutube.message.*;
+import ru.andryss.rutube.security.CustomUserDetails;
 
 @Validated
 @RestController
@@ -24,7 +25,7 @@ public class VideoController {
     @PostMapping("/api/videos:new")
     public NewVideoResponse postApiVideosNew(
             @RequestParam(required = false) String prototype,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal CustomUserDetails user
     ) {
         return interactor.postApiVideosNew(prototype, user);
     }
@@ -48,7 +49,7 @@ public class VideoController {
     public void putApiVideos(
             @PathVariable String sourceId,
             @RequestBody @Valid PutVideoRequest request,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal CustomUserDetails user
     ) {
         interactor.putApiVideos(sourceId, request, user);
     }
@@ -56,7 +57,7 @@ public class VideoController {
     @GetMapping("/api/videos/{sourceId}/status")
     public GetVideoStatusResponse getApiVideosStatus(
             @PathVariable @NotBlank String sourceId,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal CustomUserDetails user
     ) {
         return interactor.getApiVideosStatus(sourceId, user);
     }
@@ -64,7 +65,7 @@ public class VideoController {
     @PostMapping("/api/videos/{sourceId}:publish")
     public void postApiVideosPublish(
             @PathVariable @NotBlank String sourceId,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal CustomUserDetails user
     ) {
         interactor.postApiVideosPublish(sourceId, user);
     }

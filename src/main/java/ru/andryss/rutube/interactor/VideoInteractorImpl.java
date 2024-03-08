@@ -2,11 +2,11 @@ package ru.andryss.rutube.interactor;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import ru.andryss.rutube.message.*;
 import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.model.VideoStatus;
+import ru.andryss.rutube.security.CustomUserDetails;
 import ru.andryss.rutube.service.ModerationService;
 import ru.andryss.rutube.service.SourceService;
 import ru.andryss.rutube.service.VideoService;
@@ -25,7 +25,7 @@ public class VideoInteractorImpl implements VideoInteractor {
     private final ModerationService moderationService;
 
     @Override
-    public NewVideoResponse postApiVideosNew(String prototype, User user) {
+    public NewVideoResponse postApiVideosNew(String prototype, CustomUserDetails user) {
         String sourceId = UUID.randomUUID().toString();
         String uploadLink = sourceService.generateUploadLink(sourceId);
         videoService.createNewVideo(sourceId, user.getUsername(), prototype);
@@ -62,14 +62,14 @@ public class VideoInteractorImpl implements VideoInteractor {
     }
 
     @Override
-    public void putApiVideos(String sourceId, PutVideoRequest request, User user) {
+    public void putApiVideos(String sourceId, PutVideoRequest request, CustomUserDetails user) {
         VideoChangeInfo videoChangeInfo = new VideoChangeInfo(request.getTitle().trim(), request.getDescription().trim(),
                 request.getCategory(), request.getAccess(), request.isAgeRestriction(), request.isComments());
         videoService.putVideo(sourceId, user.getUsername(), videoChangeInfo);
     }
 
     @Override
-    public GetVideoStatusResponse getApiVideosStatus(String sourceId, User user) {
+    public GetVideoStatusResponse getApiVideosStatus(String sourceId, CustomUserDetails user) {
         VideoStatus status = videoService.getVideoStatus(sourceId, user.getUsername());
 
         GetVideoStatusResponse response = new GetVideoStatusResponse();
@@ -81,7 +81,7 @@ public class VideoInteractorImpl implements VideoInteractor {
     }
 
     @Override
-    public void postApiVideosPublish(String sourceId, User user) {
+    public void postApiVideosPublish(String sourceId, CustomUserDetails user) {
         videoService.publishVideo(sourceId, user.getUsername());
     }
 }

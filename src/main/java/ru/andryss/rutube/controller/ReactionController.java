@@ -4,13 +4,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.andryss.rutube.interactor.ReactionInteractor;
 import ru.andryss.rutube.message.CreateReactionRequest;
 import ru.andryss.rutube.message.GetMyReactionResponse;
 import ru.andryss.rutube.message.GetReactionsResponse;
+import ru.andryss.rutube.security.CustomUserDetails;
 
 @Validated
 @RestController
@@ -22,7 +22,7 @@ public class ReactionController {
     @PostMapping("/api/reactions")
     public void postApiReactions(
             @RequestBody @Valid CreateReactionRequest request,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal CustomUserDetails user
     ) {
         interactor.postApiReactions(request, user);
     }
@@ -37,7 +37,7 @@ public class ReactionController {
     @GetMapping("/api/reactions/my")
     public GetMyReactionResponse getApiReactionsMy(
             @RequestParam @NotBlank String sourceId,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal CustomUserDetails user
     ) {
         return interactor.getApiReactionsMy(sourceId, user);
     }

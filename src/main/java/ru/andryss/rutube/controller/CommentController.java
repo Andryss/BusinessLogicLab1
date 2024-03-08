@@ -8,12 +8,12 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.andryss.rutube.interactor.CommentInteractor;
 import ru.andryss.rutube.message.CreateCommentRequest;
 import ru.andryss.rutube.message.GetCommentsResponse;
+import ru.andryss.rutube.security.CustomUserDetails;
 
 @Validated
 @RestController
@@ -25,7 +25,7 @@ public class CommentController {
     @PostMapping("/api/comments")
     public void postApiComments(
             @RequestBody @Valid CreateCommentRequest request,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal CustomUserDetails user
     ) {
         commentInteractor.postApiComments(request, user);
     }

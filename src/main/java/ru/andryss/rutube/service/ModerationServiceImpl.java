@@ -29,7 +29,6 @@ public class ModerationServiceImpl implements ModerationService {
     private final TransactionTemplate transactionTemplate;
 
     @Override
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Optional<String> getNextModeration(String username) {
         return transactionTemplate.execute(status -> {
             Optional<String> alreadyAssigned = requestRepository.findByAssignee(username).map(ModerationRequest::getSourceId);
