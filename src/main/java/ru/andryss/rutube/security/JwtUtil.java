@@ -14,7 +14,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    @Value("${token.expire-time-ms}")
+    @Value("${token.expiration-time-ms}")
     private Long accessTokenExpirationMs;
 
     // Generate random token for each backend launch

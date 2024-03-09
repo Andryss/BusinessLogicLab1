@@ -54,8 +54,6 @@ public class SecurityConfiguration {
                         .requestMatchers(GET, "/api/reactions/my").hasRole(USER.name())
                         .requestMatchers(GET, "/api/moderation/next").hasRole(MODERATOR.name())
                         .requestMatchers(POST, "/api/moderation").hasRole(MODERATOR.name())
-                        .requestMatchers(PUT, "/api/sources/*").hasRole(USER.name())
-                        .requestMatchers(GET, "/api/sources/*").permitAll()
                         .anyRequest().permitAll()
                 )
                 .userDetailsService(userDetailsService)
