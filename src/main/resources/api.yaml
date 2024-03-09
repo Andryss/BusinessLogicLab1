@@ -721,8 +721,6 @@ paths:
           description: FORBIDDEN
         404:
           description: NOT FOUND
-        409:
-          description: CONFLICT
         413:
           description: REQUEST ENTITY TOO LARGE
 

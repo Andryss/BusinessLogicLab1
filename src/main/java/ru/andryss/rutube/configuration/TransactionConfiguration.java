@@ -2,9 +2,10 @@ package ru.andryss.rutube.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import static org.springframework.transaction.TransactionDefinition.ISOLATION_REPEATABLE_READ;
 
 @Configuration
 public class TransactionConfiguration {
@@ -27,13 +28,9 @@ public class TransactionConfiguration {
         transactionManager.setTransactionSynchronizationRegistryName("java:jboss/TransactionSynchronizationRegistry");
         transactionManager.setAllowCustomIsolationLevels(true);
         transactionManager.afterPropertiesSet();
-        TransactionDefinition defaultTransactionDefinition = new TransactionDefinition() {
-            @Override
-            public int getIsolationLevel() {
-                return ISOLATION_REPEATABLE_READ;
-            }
-        };
-        return new TransactionTemplate(transactionManager, defaultTransactionDefinition);
+        TransactionTemplate template = new TransactionTemplate(transactionManager);
+        template.setIsolationLevel(ISOLATION_REPEATABLE_READ);
+        return template;
     }
 
 }
