@@ -1,25 +1,22 @@
 package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
-import ru.andryss.rutube.exception.VideoNotFoundException;
 import ru.andryss.rutube.message.ReactionInfo;
 import ru.andryss.rutube.model.Reaction;
 import ru.andryss.rutube.model.Reaction.ReactionKey;
 import ru.andryss.rutube.model.ReactionType;
 import ru.andryss.rutube.repository.ReactionRepository;
-import ru.andryss.rutube.repository.VideoRepository;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +27,7 @@ public class ReactionServiceImpl implements ReactionService {
     private final TransactionTemplate transactionTemplate;
 
     @Override
+    @Retryable(retryFor = SQLException.class)
     public void createReaction(String sourceId, String author, ReactionType reactionType) {
         transactionTemplate.executeWithoutResult(status -> {
             videoService.findPublishedVideo(sourceId);
@@ -51,14 +49,8 @@ public class ReactionServiceImpl implements ReactionService {
     @Override
     public List<ReactionInfo> getAllReactions(String sourceId) {
         videoService.findPublishedVideo(sourceId);
-        
-        Map<ReactionType, Long> reactionsCount = reactionRepository.findAllReactionsBySource(sourceId).stream()
-                .collect(groupingBy(identity(), counting()));
-        
-        List<ReactionInfo> infoList = new ArrayList<>();
-        reactionsCount.forEach((r, c) -> infoList.add(new ReactionInfo(r, c)));
-        
-        return infoList;
+
+        return reactionRepository.findAllReactionsBySource(sourceId);
     }
 
     @Override

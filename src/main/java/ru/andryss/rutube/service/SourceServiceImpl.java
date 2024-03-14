@@ -1,6 +1,7 @@
 package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,7 @@ import ru.andryss.rutube.repository.SourceRepository;
 import ru.andryss.rutube.repository.VideoRepository;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -39,6 +41,7 @@ public class SourceServiceImpl implements SourceService {
     }
 
     @Override
+    @Retryable(retryFor = SQLException.class)
     public void putVideo(String sourceId, MultipartFile file) {
         if (!uploadLinks.contains(sourceId)) {
             throw new LinkNotFoundException(sourceId);

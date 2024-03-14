@@ -1,6 +1,8 @@
 package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +15,7 @@ import ru.andryss.rutube.repository.ModerationRequestRepository;
 import ru.andryss.rutube.repository.ModerationResultRepository;
 import ru.andryss.rutube.repository.VideoRepository;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -29,6 +32,7 @@ public class ModerationServiceImpl implements ModerationService {
     private final TransactionTemplate transactionTemplate;
 
     @Override
+    @Retryable(retryFor = SQLException.class)
     public Optional<String> getNextModeration(String username) {
         return transactionTemplate.execute(status -> {
             Optional<String> alreadyAssigned = requestRepository.findByAssignee(username).map(ModerationRequest::getSourceId);
@@ -41,6 +45,7 @@ public class ModerationServiceImpl implements ModerationService {
     }
 
     @Override
+    @Retryable(retryFor = SQLException.class)
     public void uploadModeration(String sourceId, String username, ModerationStatus status, String comment) {
         transactionTemplate.executeWithoutResult(transactionStatus -> {
             ModerationRequest request = requestRepository.findByAssignee(username).orElseThrow(() -> new SourceNotFoundException(sourceId));

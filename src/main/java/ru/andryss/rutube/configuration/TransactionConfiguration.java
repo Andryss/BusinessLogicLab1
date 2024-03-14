@@ -2,23 +2,15 @@ package ru.andryss.rutube.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.springframework.transaction.TransactionDefinition.ISOLATION_REPEATABLE_READ;
 
 @Configuration
+@EnableRetry
 public class TransactionConfiguration {
-
-//    НЕ РАБОТАЕТ ?????
-//    @Bean
-//    public PlatformTransactionManager transactionManager() {
-//        JtaTransactionManager transactionManager = new JtaTransactionManager();
-//        transactionManager.setTransactionManagerName("java:jboss/TransactionManager");
-//        transactionManager.setUserTransactionName("java:jboss/UserTransaction");
-//        transactionManager.setTransactionSynchronizationRegistryName("java:jboss/TransactionSynchronizationRegistry");
-//        return transactionManager;
-//    }
 
     @Bean
     public TransactionTemplate transactionTemplate() {

@@ -2,6 +2,8 @@ package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.andryss.rutube.exception.CommentNotFoundException;
@@ -12,6 +14,7 @@ import ru.andryss.rutube.model.Comment;
 import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.repository.CommentRepository;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +30,7 @@ public class CommentServiceImpl implements CommentService {
     private final TransactionTemplate transactionTemplate;
 
     @Override
+    @Retryable(retryFor = SQLException.class)
     public void createComment(String sourceId, String author, String parentId, String content) {
         transactionTemplate.executeWithoutResult(status -> {
             Video video = videoService.findPublishedVideo(sourceId);
