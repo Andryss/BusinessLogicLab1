@@ -25,6 +25,7 @@ public class VideoServiceImpl implements VideoService {
 
     private final VideoRepository videoRepository;
     private final TransactionTemplate transactionTemplate;
+    private final TransactionTemplate readOnlyTransactionTemplate;
 
     @Override
     public void createNewVideo(String sourceId, String author, String prototype) {
@@ -80,9 +81,11 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public VideoStatus getVideoStatus(String sourceId, String author) {
-        Video video = videoRepository.findBySourceIdAndAuthor(sourceId, author).orElseThrow(() -> new VideoNotFoundException(sourceId));
+        return readOnlyTransactionTemplate.execute(status -> {
+            Video video = videoRepository.findBySourceIdAndAuthor(sourceId, author).orElseThrow(() -> new VideoNotFoundException(sourceId));
 
-        return video.getStatus();
+            return video.getStatus();
+        });
     }
 
     @Override
@@ -103,31 +106,35 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public List<VideoThumbInfo> getPublishedVideos(PageRequest pageRequest) {
-        List<Video> published = videoRepository.findAllPublished(pageRequest);
-        List<VideoThumbInfo> infoList = new ArrayList<>(published.size());
+        return readOnlyTransactionTemplate.execute(status -> {
+            List<Video> published = videoRepository.findAllPublished(pageRequest);
+            List<VideoThumbInfo> infoList = new ArrayList<>(published.size());
 
-        for (Video video : published) {
-            VideoThumbInfo info = new VideoThumbInfo();
-            info.setVideoId(video.getSourceId());
-            info.setAuthor(video.getAuthor());
-            info.setTitle(video.getTitle());
-            info.setCategory(video.getCategory());
-            info.setPublishedAt(video.getPublishedAt());
+            for (Video video : published) {
+                VideoThumbInfo info = new VideoThumbInfo();
+                info.setVideoId(video.getSourceId());
+                info.setAuthor(video.getAuthor());
+                info.setTitle(video.getTitle());
+                info.setCategory(video.getCategory());
+                info.setPublishedAt(video.getPublishedAt());
 
-            infoList.add(info);
-        }
+                infoList.add(info);
+            }
 
-        return infoList;
+            return infoList;
+        });
     }
 
     @Override
     public Video findPublishedVideo(String sourceId) {
-        Video video = videoRepository.findById(sourceId).orElseThrow(() -> new VideoNotFoundException(sourceId));
+        return readOnlyTransactionTemplate.execute(status -> {
+            Video video = videoRepository.findById(sourceId).orElseThrow(() -> new VideoNotFoundException(sourceId));
 
-        if (video.getStatus() != PUBLISHED || video.getAccess() != PUBLIC) {
-            throw new VideoNotFoundException(sourceId);
-        }
+            if (video.getStatus() != PUBLISHED || video.getAccess() != PUBLIC) {
+                throw new VideoNotFoundException(sourceId);
+            }
 
-        return video;
+            return video;
+        });
     }
 }

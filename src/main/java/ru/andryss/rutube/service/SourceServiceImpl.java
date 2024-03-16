@@ -30,6 +30,7 @@ public class SourceServiceImpl implements SourceService {
     private final VideoRepository videoRepository;
     private final ModerationRequestRepository requestRepository;
     private final TransactionTemplate transactionTemplate;
+    private final TransactionTemplate readOnlyTransactionTemplate;
 
     private final Set<String> uploadLinks = new ConcurrentSkipListSet<>();
     private final Set<String> downloadLinks = new ConcurrentSkipListSet<>();
@@ -93,9 +94,10 @@ public class SourceServiceImpl implements SourceService {
         if (!downloadLinks.contains(sourceId)) {
             throw new LinkNotFoundException(sourceId);
         }
+        return readOnlyTransactionTemplate.execute(status -> {
+            Source source = sourceRepository.findById(sourceId).orElseThrow(() -> new SourceNotFoundException(sourceId));
 
-        Source source = sourceRepository.findById(sourceId).orElseThrow(() -> new SourceNotFoundException(sourceId));
-
-        return source.getContent();
+            return source.getContent();
+        });
     }
 }

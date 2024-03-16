@@ -1,16 +1,16 @@
 package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.andryss.rutube.exception.IncorrectVideoStatusException;
 import ru.andryss.rutube.exception.SourceNotFoundException;
 import ru.andryss.rutube.exception.VideoNotFoundException;
-import ru.andryss.rutube.model.*;
+import ru.andryss.rutube.model.ModerationRequest;
+import ru.andryss.rutube.model.ModerationResult;
+import ru.andryss.rutube.model.ModerationStatus;
+import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.repository.ModerationRequestRepository;
 import ru.andryss.rutube.repository.ModerationResultRepository;
 import ru.andryss.rutube.repository.VideoRepository;
@@ -30,6 +30,7 @@ public class ModerationServiceImpl implements ModerationService {
     private final ModerationResultRepository resultRepository;
     private final VideoRepository videoRepository;
     private final TransactionTemplate transactionTemplate;
+    private final TransactionTemplate readOnlyTransactionTemplate;
 
     @Override
     @Retryable(retryFor = SQLException.class)
@@ -82,7 +83,10 @@ public class ModerationServiceImpl implements ModerationService {
 
     @Override
     public String getModerationComment(String sourceId) {
-        ModerationResult result = resultRepository.findById(sourceId).orElseThrow(() -> new SourceNotFoundException(sourceId));
-        return result.getComment();
+        return readOnlyTransactionTemplate.execute(status -> {
+            ModerationResult result = resultRepository.findById(sourceId).orElseThrow(() -> new SourceNotFoundException(sourceId));
+
+            return result.getComment();
+        });
     }
 }

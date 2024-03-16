@@ -1,7 +1,6 @@
 package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -13,9 +12,7 @@ import ru.andryss.rutube.repository.ReactionRepository;
 
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -25,6 +22,7 @@ public class ReactionServiceImpl implements ReactionService {
     private final VideoService videoService;
     private final ReactionRepository reactionRepository;
     private final TransactionTemplate transactionTemplate;
+    private final TransactionTemplate readOnlyTransactionTemplate;
 
     @Override
     @Retryable(retryFor = SQLException.class)
@@ -48,15 +46,19 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Override
     public List<ReactionInfo> getAllReactions(String sourceId) {
-        videoService.findPublishedVideo(sourceId);
+        return readOnlyTransactionTemplate.execute(status -> {
+            videoService.findPublishedVideo(sourceId);
 
-        return reactionRepository.findAllReactionsBySource(sourceId);
+            return reactionRepository.findAllReactionsBySource(sourceId);
+        });
     }
 
     @Override
     public Optional<ReactionType> getMyReaction(String sourceId, String author) {
-        videoService.findPublishedVideo(sourceId);
-        
-        return reactionRepository.findById(new ReactionKey(sourceId, author)).map(Reaction::getType);
+        return readOnlyTransactionTemplate.execute(status -> {
+            videoService.findPublishedVideo(sourceId);
+
+            return reactionRepository.findById(new ReactionKey(sourceId, author)).map(Reaction::getType);
+        });
     }
 }

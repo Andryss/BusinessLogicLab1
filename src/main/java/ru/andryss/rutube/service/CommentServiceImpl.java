@@ -2,7 +2,6 @@ package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -28,6 +27,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final VideoService videoService;
     private final TransactionTemplate transactionTemplate;
+    private final TransactionTemplate readOnlyTransactionTemplate;
 
     @Override
     @Retryable(retryFor = SQLException.class)
@@ -60,33 +60,35 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentInfo> getComments(String sourceId, String parentId, PageRequest pageRequest) {
-        Video video = videoService.findPublishedVideo(sourceId);
-        if (!video.isComments()) {
-            throw new CommentsDisableException(sourceId);
-        }
-
-        PageRequest page = pageRequest.withSort(by("createdAt"));
-        List<Comment> comments;
-        if (parentId == null) {
-            comments = commentRepository.findAllBySourceId(sourceId, page);
-        } else {
-            if (!commentRepository.existsBySourceIdAndParent(sourceId, parentId)) {
-                throw new CommentNotFoundException(parentId);
+        return readOnlyTransactionTemplate.execute(status -> {
+            Video video = videoService.findPublishedVideo(sourceId);
+            if (!video.isComments()) {
+                throw new CommentsDisableException(sourceId);
             }
-            comments = commentRepository.findAllBySourceIdAndParent(sourceId, parentId, page);
-        }
 
-        List<CommentInfo> commentInfos = new ArrayList<>(comments.size());
-        for (Comment comment : comments) {
-            CommentInfo info = new CommentInfo();
-            info.setCommentId(comment.getId());
-            info.setAuthor(comment.getAuthor());
-            info.setContent(comment.getContent());
-            info.setReplies(comment.getReplies());
-            info.setPostedAt(comment.getCreatedAt());
-            commentInfos.add(info);
-        }
+            PageRequest page = pageRequest.withSort(by("createdAt"));
+            List<Comment> comments;
+            if (parentId == null) {
+                comments = commentRepository.findAllBySourceId(sourceId, page);
+            } else {
+                if (!commentRepository.existsBySourceIdAndParent(sourceId, parentId)) {
+                    throw new CommentNotFoundException(parentId);
+                }
+                comments = commentRepository.findAllBySourceIdAndParent(sourceId, parentId, page);
+            }
 
-        return commentInfos;
+            List<CommentInfo> commentInfos = new ArrayList<>(comments.size());
+            for (Comment comment : comments) {
+                CommentInfo info = new CommentInfo();
+                info.setCommentId(comment.getId());
+                info.setAuthor(comment.getAuthor());
+                info.setContent(comment.getContent());
+                info.setReplies(comment.getReplies());
+                info.setPostedAt(comment.getCreatedAt());
+                commentInfos.add(info);
+            }
+
+            return commentInfos;
+        });
     }
 }
