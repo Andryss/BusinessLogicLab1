@@ -11,7 +11,7 @@
     <groupId>ru.andryss</groupId>
     <artifactId>rutube</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>BusinessLogicLab1</name>
+    <name>rutube</name>
     <packaging>war</packaging>
     <description>BusinessLogicLab1</description>
     <properties>
