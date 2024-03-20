@@ -1,21 +1,10 @@
 package ru.andryss.rutube.interactor;
 
-import org.springframework.security.core.userdetails.User;
-import ru.andryss.rutube.message.GetNextModerationResponse;
-import ru.andryss.rutube.message.UploadModerationResultRequest;
-import ru.andryss.rutube.security.CustomUserDetails;
+import ru.andryss.rutube.message.ModerationResultInfo;
 
-/**
- * Interactor for handling moderation requests
- */
 public interface ModerationInteractor {
     /**
-     * Handles GET /api/moderation/next request
+     * Handles message from moderation.results topic
      */
-    GetNextModerationResponse getApiModerationNext(CustomUserDetails user);
-
-    /**
-     * Handles POST /api/moderation request
-     */
-    void postApiModeration(UploadModerationResultRequest request, CustomUserDetails user);
+    void handleModerationResult(ModerationResultInfo result);
 }

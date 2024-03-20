@@ -18,7 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import ru.andryss.rutube.security.JwtFilter;
 
 import static org.springframework.http.HttpMethod.*;
-import static ru.andryss.rutube.model.Role.MODERATOR;
 import static ru.andryss.rutube.model.Role.USER;
 
 @Configuration
@@ -52,8 +51,6 @@ public class SecurityConfiguration {
                         .requestMatchers(POST, "/api/reactions").hasRole(USER.name())
                         .requestMatchers(GET, "/api/reactions").permitAll()
                         .requestMatchers(GET, "/api/reactions/my").hasRole(USER.name())
-                        .requestMatchers(GET, "/api/moderation/next").hasRole(MODERATOR.name())
-                        .requestMatchers(POST, "/api/moderation").hasRole(MODERATOR.name())
                         .requestMatchers(PUT, "/api/sources/*").hasRole(USER.name())
                         .requestMatchers(GET, "/api/sources/*").permitAll()
                         .requestMatchers(POST, "/api/auth/login").permitAll()

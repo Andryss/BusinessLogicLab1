@@ -2,30 +2,21 @@ package ru.andryss.rutube.service;
 
 import ru.andryss.rutube.model.ModerationStatus;
 
-import java.util.Optional;
+import java.time.Instant;
 
 /**
  * Service for working with moderation
  */
 public interface ModerationService {
     /**
-     * Assigns next source to moderate
-     *
-     * @param username moderator
-     * @return assigned source (or previous if wasn't moderated)
-     */
-    Optional<String> getNextModeration(String username);
-
-    /**
-     * Saves moderation result
+     * Handle new moderation result
      *
      * @param sourceId moderated source
-     * @param username moderator
      * @param status moderation result
-     * @param comment result comment (e.g. reject reason)
+     * @param comment comment
+     * @param createdAt creation timestamp
      */
-    void uploadModeration(String sourceId, String username, ModerationStatus status, String comment);
-
+    void handleResult(String sourceId, ModerationStatus status, String comment, Instant createdAt);
     /**
      * Find comment of moderation result
      *

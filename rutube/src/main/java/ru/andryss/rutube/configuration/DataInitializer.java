@@ -36,11 +36,6 @@ public class DataInitializer implements ServletContextListener {
         user2.setPassword(passwordEncoder.encode("user2"));
         user2.setRole(Role.USER);
 
-        User moderator = new User();
-        moderator.setUsername("moderator");
-        moderator.setPassword(passwordEncoder.encode("moderator"));
-        moderator.setRole(Role.MODERATOR);
-
-        transactionTemplate.executeWithoutResult(status -> userRepository.saveAll(List.of(user1, user2, moderator)));
+        transactionTemplate.executeWithoutResult(status -> userRepository.saveAll(List.of(user1, user2)));
     }
 }

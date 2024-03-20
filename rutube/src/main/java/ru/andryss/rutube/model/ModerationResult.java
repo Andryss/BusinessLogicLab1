@@ -19,8 +19,6 @@ public class ModerationResult {
     @Id
     String sourceId;
 
-    String assignee;
-
     @Enumerated(STRING)
     ModerationStatus status;
 
