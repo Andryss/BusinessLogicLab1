@@ -13,7 +13,7 @@ public class ModerationMessageHandler {
 
     private final ModerationInteractor interactor;
 
-    @KafkaListener(topics = "${topic.moderation.requests}", groupId = "default")
+    @KafkaListener(topics = "${topic.moderation.requests}", groupId = "default", containerFactory = "requestListenerFactory")
     public void handleModerationRequest(
             @Payload ModerationRequestInfo info
     ) {

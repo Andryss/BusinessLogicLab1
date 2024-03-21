@@ -1,6 +1,7 @@
 package ru.andryss.rutube.controller;
 
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -16,6 +17,7 @@ import ru.andryss.rutube.message.ErrorMessage;
 
 import static org.springframework.http.HttpStatus.*;
 
+@Slf4j
 @ResponseBody
 @ControllerAdvice
 public class CustomControllerAdvice {
@@ -28,12 +30,14 @@ public class CustomControllerAdvice {
     })
     @ResponseStatus(BAD_REQUEST)
     ErrorMessage handleBadRequest(Exception e) {
+        log.info("caught {} returned 400 ({})", e.getClass().getName(), e.getMessage());
         return new ErrorMessage(e.getMessage());
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     @ResponseStatus(UNSUPPORTED_MEDIA_TYPE)
     ErrorMessage handleUnsupportedMediaType(Exception e) {
+        log.info("caught HttpMediaTypeNotSupportedException returned 415 ({})", e.getMessage());
         return new ErrorMessage(e.getMessage());
     }
     
@@ -44,18 +48,22 @@ public class CustomControllerAdvice {
         if (messageArguments == null) {
             return new ErrorMessage(e.getMessage());
         }
-        return new ErrorMessage((String) e.getDetailMessageArguments()[1]);
+        String message = (String) e.getDetailMessageArguments()[1];
+        log.info("caught MethodArgumentNotValidException returned 400 ({})", message);
+        return new ErrorMessage(message);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(BAD_REQUEST)
     ErrorMessage handleMissingServletRequestParameter(MissingServletRequestParameterException e) {
+        log.info("caught MissingServletRequestParameterException returned 400 ({})", e.getParameterName());
         return new ErrorMessage(String.format("request parameter %s is missing", e.getParameterName()));
     }
 
     @ExceptionHandler(SourceNotFoundException.class)
     @ResponseStatus(NOT_FOUND)
     ErrorMessage handleSourceNotFound(SourceNotFoundException e) {
+        log.info("caught SourceNotFoundException returned 404 ({})", e.getMessage());
         return new ErrorMessage(String.format("source %s not found", e.getMessage()));
     }
 }

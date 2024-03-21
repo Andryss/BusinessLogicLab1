@@ -1,6 +1,7 @@
 package ru.andryss.rutube.interactor;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.andryss.rutube.message.GetNextModerationResponse;
 import ru.andryss.rutube.message.ModerationRequestInfo;
@@ -8,6 +9,7 @@ import ru.andryss.rutube.message.UploadModerationResultRequest;
 import ru.andryss.rutube.security.CustomUserDetails;
 import ru.andryss.rutube.service.ModerationService;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ModerationInteractorImpl implements ModerationInteractor {
@@ -33,6 +35,7 @@ public class ModerationInteractorImpl implements ModerationInteractor {
 
     @Override
     public void moderationRequestMessage(ModerationRequestInfo request) {
+        log.info("got ModerationRequest message {}", request);
         moderationService.handleRequest(request.getSourceId(), request.getDownloadLink(), request.getCreatedAt());
     }
 }
