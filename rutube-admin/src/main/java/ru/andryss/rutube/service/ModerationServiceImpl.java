@@ -8,6 +8,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.andryss.rutube.exception.SourceNotFoundException;
+import ru.andryss.rutube.message.AssignmentInfo;
 import ru.andryss.rutube.message.ModerationInfo;
 import ru.andryss.rutube.message.ModerationResultInfo;
 import ru.andryss.rutube.model.ModerationHistory;
@@ -18,6 +19,7 @@ import ru.andryss.rutube.repository.ModerationRequestRepository;
 
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,6 +30,7 @@ public class ModerationServiceImpl implements ModerationService {
     private final ModerationHistoryRepository historyRepository;
     private final KafkaProducer<String, ModerationResultInfo> moderationResultProducer;
     private final TransactionTemplate transactionTemplate;
+    private final TransactionTemplate readOnlyTransactionTemplate;
 
     @Value("${topic.moderation.results}")
     private String moderationResultsTopic;
@@ -88,5 +91,10 @@ public class ModerationServiceImpl implements ModerationService {
 
             requestRepository.save(request);
         });
+    }
+
+    @Override
+    public List<AssignmentInfo> findRequestsAssignedBefore(Instant timestamp) {
+        return readOnlyTransactionTemplate.execute(status -> requestRepository.findAssignedBefore(timestamp));
     }
 }

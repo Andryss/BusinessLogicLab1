@@ -32,6 +32,7 @@ public class DataInitializer implements ServletContextListener {
             Moderator moderator = new Moderator();
             moderator.setUsername("moderator");
             moderator.setPassword(passwordEncoder.encode("moderator"));
+            moderator.setEmail("moderator@example.mail");
             moderator.setRole(Role.MODERATOR);
 
             moderatorRepository.save(moderator);

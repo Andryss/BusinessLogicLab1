@@ -1,9 +1,11 @@
 package ru.andryss.rutube.service;
 
+import ru.andryss.rutube.message.AssignmentInfo;
 import ru.andryss.rutube.message.ModerationInfo;
 import ru.andryss.rutube.model.ModerationStatus;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -36,4 +38,12 @@ public interface ModerationService {
      * @param createdAt request creation time
      */
     void handleRequest(String sourceId, String downloadLink, Instant createdAt);
+
+    /**
+     * Finds moderation request assigned before given timestamp
+     *
+     * @param timestamp timestamp to search
+     * @return found moderation assignments
+     */
+    List<AssignmentInfo> findRequestsAssignedBefore(Instant timestamp);
 }
