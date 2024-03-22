@@ -1,0 +1,153 @@
+openapi: 3.0.3
+
+info:
+  title: Пародия на rutube админка
+  description: Пародия бизнес процесса загрузки видео и потребления контента c сайта https://rutube.ru
+  version: 1.0.0
+
+components:
+  schemas:
+    sourceId:
+      type: string
+      format: uuid
+      description: Идентификатор контента
+      example: "4153ca20-a15d-478e-9427-875f95c677f8"
+
+    downloadLink:
+      type: string
+      description: Ссылка для загрузки (GET по ссылке)
+      example: "https://example.site/download/link"
+
+    result:
+      type: string
+      description: Результат модерации
+      example: "FAILURE"
+      enum:
+        - "SUCCESS"
+        - "FAILURE"
+
+    comment:
+      type: string
+      description: Комментарий
+      example: "присутствуют сцены насилия"
+
+    username:
+      type: string
+      description: Имя пользователя
+      example: "cup_of_code"
+
+    password:
+      type: string
+      description: Пароль
+      example: "1234"
+
+    token:
+      type: string
+      description: Токен аутентификации
+      example: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiaWF0IjoxNzA5ODk2MTY4LCJleHAiOjE3MDk4OTc5Njh9..."
+
+    GetNextModerationResponse:
+      type: object
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/sourceId"
+        downloadLink:
+          $ref: "#/components/schemas/downloadLink"
+
+    UploadModerationResultRequest:
+      type: object
+      properties:
+        sourceId:
+          $ref: "#/components/schemas/sourceId"
+        result:
+          $ref: "#/components/schemas/result"
+        comment:
+          $ref: "#/components/schemas/comment"
+
+    AuthRequest:
+      type: object
+      properties:
+        username:
+          $ref: "#/components/schemas/username"
+        password:
+          $ref: "#/components/schemas/password"
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          $ref: "#/components/schemas/token"
+
+  securitySchemes:
+    bearerToken:
+      description: Bearer аутентификация
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+paths:
+  /api/moderation/next:
+    get:
+      summary: Получение следующего контента для модерации
+      tags:
+        - moderation
+      security:
+        - bearerToken: []
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetNextModerationResponse"
+        401:
+          description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
+
+  /api/moderation:
+    post:
+      summary: Загрузка результата модерации
+      tags:
+        - moderation
+      security:
+        - bearerToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadModerationResultRequest"
+      responses:
+        200:
+          description: OK
+        400:
+          description: BAD REQUEST
+        401:
+          description: UNAUTHORIZED
+        403:
+          description: FORBIDDEN
+        404:
+          description: NOT FOUND
+
+  /api/auth/login:
+    post:
+      summary: Вход администратора в систему
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        400:
+          description: BAD REQUEST
+        401:
+          description: UNAUTHORIZED

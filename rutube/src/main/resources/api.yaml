@@ -1,7 +1,7 @@
 openapi: 3.0.3
 
 info:
-  title: Бизнес логика
+  title: Пародия на rutube
   description: Пародия бизнес процесса загрузки видео и потребления контента c сайта https://rutube.ru
   version: 1.0.0
 
@@ -34,7 +34,6 @@ components:
       maxLength: 5000
       description: Описание
       example: "ставьте лайки пж"
-
 
     category:
       type: string
@@ -107,13 +106,6 @@ components:
       enum:
         - "LIKE"
         - "DISLIKE"
-
-    result:
-      type: string
-      description: Результат модерации
-      enum:
-        - "SUCCESS"
-        - "FAILURE"
 
     comment:
       type: string
@@ -287,24 +279,6 @@ components:
       properties:
         reaction:
           $ref: "#/components/schemas/reaction"
-
-    GetNextModerationResponse:
-      type: object
-      properties:
-        sourceId:
-          $ref: "#/components/schemas/sourceId"
-        downloadLink:
-          $ref: "#/components/schemas/downloadLink"
-
-    UploadModerationResultRequest:
-      type: object
-      properties:
-        sourceId:
-          $ref: "#/components/schemas/sourceId"
-        result:
-          $ref: "#/components/schemas/result"
-        comment:
-          $ref: "#/components/schemas/comment"
 
     PutSourceRequest:
       type: object
@@ -639,49 +613,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetMyReactionResponse"
-        400:
-          description: BAD REQUEST
-        401:
-          description: UNAUTHORIZED
-        403:
-          description: FORBIDDEN
-        404:
-          description: NOT FOUND
-
-  /api/moderation/next:
-    get:
-      summary: Получение следующего контента для модерации
-      tags:
-        - moderation
-      security:
-        - bearerToken: []
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetNextModerationResponse"
-        401:
-          description: UNAUTHORIZED
-        403:
-          description: FORBIDDEN
-
-  /api/moderation:
-    post:
-      summary: Загрузка результата модерации
-      tags:
-        - moderation
-      security:
-        - bearerToken: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UploadModerationResultRequest"
-      responses:
-        200:
-          description: OK
         400:
           description: BAD REQUEST
         401:
