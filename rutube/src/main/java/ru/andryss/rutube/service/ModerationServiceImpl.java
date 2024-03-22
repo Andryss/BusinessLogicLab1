@@ -47,6 +47,7 @@ public class ModerationServiceImpl implements ModerationService {
             } else {
                 video.setStatus(FILL_PENDING);
             }
+            video.setUpdatedAt(Instant.now());
 
             resultRepository.save(result);
             videoRepository.save(video);

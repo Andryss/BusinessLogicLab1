@@ -11,6 +11,7 @@ import ru.andryss.rutube.message.VideoThumbInfo;
 import ru.andryss.rutube.model.User;
 import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.model.VideoStatus;
+import ru.andryss.rutube.repository.UserRepository;
 import ru.andryss.rutube.repository.VideoRepository;
 
 import java.time.Instant;
@@ -25,6 +26,7 @@ import static ru.andryss.rutube.model.VideoStatus.*;
 public class VideoServiceImpl implements VideoService {
 
     private final VideoRepository videoRepository;
+    private final UserRepository userRepository;
     private final TransactionTemplate transactionTemplate;
     private final TransactionTemplate readOnlyTransactionTemplate;
 
@@ -141,7 +143,7 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public List<User> findUsersWithPendingActions(Instant timestamp) {
-        return readOnlyTransactionTemplate.execute(status -> videoRepository.findUsersWithPendingActions(timestamp));
+        return readOnlyTransactionTemplate.execute(status -> userRepository.findWithVideosPendingActions(timestamp));
     }
 
     @Override
