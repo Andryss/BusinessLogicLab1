@@ -2,11 +2,9 @@ package ru.andryss.rutube.service;
 
 import org.springframework.data.domain.PageRequest;
 import ru.andryss.rutube.message.VideoThumbInfo;
-import ru.andryss.rutube.model.Video;
-import ru.andryss.rutube.model.VideoAccess;
-import ru.andryss.rutube.model.VideoCategory;
-import ru.andryss.rutube.model.VideoStatus;
+import ru.andryss.rutube.model.*;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -62,6 +60,23 @@ public interface VideoService {
      * @return found video
      */
     Video findPublishedVideo(String sourceId);
+
+    /**
+     * Finds all users with videos pending user actions (UPLOAD_PENDING, FILL_PENDING) more than specified time
+     *
+     * @param timestamp videos updated earlier than timestamp will be ignored
+     * @return found users
+     */
+    List<User> findUsersWithPendingActions(Instant timestamp);
+
+    /**
+     * Finds user videos pending his actions (UPLOAD_PENDING, FILL_PENDING) more than specified time
+     *
+     * @param author user to search
+     * @param timestamp videos updated earlier than timestamp will be ignored
+     * @return found videos
+     */
+    List<Video> findVideosPendingActions(String author, Instant timestamp);
 
     record VideoChangeInfo(String title, String description, VideoCategory category, VideoAccess access,
                            Boolean ageRestriction, Boolean comments) { }

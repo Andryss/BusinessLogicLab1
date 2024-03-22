@@ -4,10 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
+import ru.andryss.rutube.exception.IncorrectVideoStatusException;
 import ru.andryss.rutube.exception.VideoAlreadyPublishedException;
 import ru.andryss.rutube.exception.VideoNotFoundException;
-import ru.andryss.rutube.exception.IncorrectVideoStatusException;
 import ru.andryss.rutube.message.VideoThumbInfo;
+import ru.andryss.rutube.model.User;
 import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.model.VideoStatus;
 import ru.andryss.rutube.repository.VideoRepository;
@@ -136,5 +137,15 @@ public class VideoServiceImpl implements VideoService {
 
             return video;
         });
+    }
+
+    @Override
+    public List<User> findUsersWithPendingActions(Instant timestamp) {
+        return readOnlyTransactionTemplate.execute(status -> videoRepository.findUsersWithPendingActions(timestamp));
+    }
+
+    @Override
+    public List<Video> findVideosPendingActions(String author, Instant timestamp) {
+        return readOnlyTransactionTemplate.execute(status -> videoRepository.findAllPendingActions(author, timestamp));
     }
 }
