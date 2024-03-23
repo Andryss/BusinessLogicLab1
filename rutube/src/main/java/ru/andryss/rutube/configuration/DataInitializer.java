@@ -39,7 +39,7 @@ public class DataInitializer implements ServletContextListener {
             User user2 = new User();
             user2.setUsername("user2");
             user2.setPassword(passwordEncoder.encode("user2"));
-            user1.setEmail("user2@example.mail");
+            user2.setEmail("user2@example.mail");
             user2.setRole(Role.USER);
 
             userRepository.saveAll(List.of(user1, user2));
