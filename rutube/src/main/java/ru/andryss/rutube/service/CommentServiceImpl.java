@@ -69,7 +69,7 @@ public class CommentServiceImpl implements CommentService {
             PageRequest page = pageRequest.withSort(by("createdAt"));
             List<Comment> comments;
             if (parentId == null) {
-                comments = commentRepository.findAllBySourceId(sourceId, page);
+                comments = commentRepository.findAllBySourceIdAndParentNull(sourceId, page);
             } else {
                 if (!commentRepository.existsBySourceIdAndParent(sourceId, parentId)) {
                     throw new CommentNotFoundException(parentId);

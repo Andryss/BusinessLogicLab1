@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -19,6 +20,9 @@ public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
 
+    @Value("${mail.sender}")
+    private String sender;
+
     @Override
     @Async("mailExecutor")
     public void sendVideosPendingActionsNotification(String author, String email, Map<VideoStatus, Long> counts) {
@@ -28,7 +32,7 @@ public class MailServiceImpl implements MailService {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, "utf-8");
 
             messageHelper.setTo(email);
-            messageHelper.setFrom("rutube-parody@yandex.ru");
+            messageHelper.setFrom(sender);
             messageHelper.setSubject("Videos pending actions");
             messageHelper.setText(formatMessage(author, counts));
 

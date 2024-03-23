@@ -4,7 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +19,17 @@ public class JwtUtil {
     @Value("${token.expire-time-ms}")
     private Long accessTokenExpirationMs;
 
-    // Generate random token for each backend launch
-    private final Key signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    @Value("${token.secret}")
+    private String secret;
+
+    private Key signingKey;
+
+    @PostConstruct
+    public void init() {
+        byte[] bytes = Decoders.BASE64.decode(secret);
+        signingKey = Keys.hmacShaKeyFor(bytes);
+        secret = null;
+    }
 
     public String generateAccessToken(String username) {
         Date now = new Date();
