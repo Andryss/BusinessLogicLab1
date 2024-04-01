@@ -15,6 +15,12 @@ public interface VideoRepository extends JpaRepository<Video, String> {
     @Query(value = "select * from videos where status = 'PUBLISHED'", nativeQuery = true)
     List<Video> findAllPublished(Pageable pageable);
 
-    @Query(value = "select * from videos where author = :author and status in ('UPLOAD_PENDING', 'FILL_PENDING') and updated_at < :timestamp", nativeQuery = true)
+    @Query(value = """
+        select * from videos
+        where author = :author and status in ('UPLOAD_PENDING', 'FILL_PENDING') and updated_at < :timestamp
+    """, nativeQuery = true)
     List<Video> findAllPendingActions(String author, Instant timestamp);
+
+    @Query(value = "select source_id from videos where status = 'MODERATION_PENDING' and updated_at < :timestamp", nativeQuery = true)
+    List<String> findAllPendingModeration(Instant timestamp);
 }

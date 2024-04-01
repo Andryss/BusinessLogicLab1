@@ -150,4 +150,9 @@ public class VideoServiceImpl implements VideoService {
     public List<Video> findVideosPendingActions(String author, Instant timestamp) {
         return readOnlyTransactionTemplate.execute(status -> videoRepository.findAllPendingActions(author, timestamp));
     }
+
+    @Override
+    public List<String> findVideosPendingModeration(Instant timestamp) {
+        return readOnlyTransactionTemplate.execute(status -> videoRepository.findAllPendingModeration(timestamp));
+    }
 }

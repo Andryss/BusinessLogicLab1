@@ -15,8 +15,6 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import ru.andryss.rutube.message.ModerationRequestInfo;
-import ru.andryss.rutube.message.ModerationResultInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,34 +28,48 @@ public class KafkaConfiguration {
     @Value("${topic.moderation.requests}")
     private String moderationRequestsTopic;
 
+    @Value("${topic.moderation.resends}")
+    private String moderationResendsTopic;
+
     @Value("${topic.moderation.results}")
     private String moderationResultsTopic;
 
+    private final String typeMappings = "request:ru.andryss.rutube.message.ModerationRequestInfo, " +
+            "resend:ru.andryss.rutube.message.ModerationResendInfo";
+
     @Bean
-    public KafkaProducer<String, ModerationResultInfo> resultProducer() {
+    public KafkaProducer<String, Object> kafkaProducer() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(JsonSerializer.TYPE_MAPPINGS, typeMappings);
         return new KafkaProducer<>(props, new StringSerializer(), new JsonSerializer<>(new TypeReference<>(){}));
     }
 
     @Bean
-    public ConsumerFactory<String, ModerationRequestInfo> requestConsumerFactory() {
+    public ConsumerFactory<String, Object> kafkaConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
+        props.put(JsonDeserializer.TYPE_MAPPINGS, typeMappings);
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(new TypeReference<>(){}));
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, ModerationRequestInfo> requestListenerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, ModerationRequestInfo> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(requestConsumerFactory());
+        factory.setConsumerFactory(kafkaConsumerFactory());
         return factory;
     }
 
     @Bean
     public NewTopic moderationRequestsTopic() {
         return new NewTopic(moderationRequestsTopic, 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic moderationResendsTopic() {
+        return new NewTopic(moderationResendsTopic, 1, (short) 1);
     }
 
     @Bean

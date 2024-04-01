@@ -1,15 +1,11 @@
 package ru.andryss.rutube.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import ru.andryss.rutube.exception.*;
-import ru.andryss.rutube.message.ModerationRequestInfo;
 import ru.andryss.rutube.model.Source;
 import ru.andryss.rutube.model.Video;
 import ru.andryss.rutube.repository.SourceRepository;
@@ -17,7 +13,6 @@ import ru.andryss.rutube.repository.VideoRepository;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -30,12 +25,9 @@ public class SourceServiceImpl implements SourceService {
 
     private final SourceRepository sourceRepository;
     private final VideoRepository videoRepository;
+    private final ModerationRequestSenderService requestSenderService;
     private final TransactionTemplate transactionTemplate;
     private final TransactionTemplate readOnlyTransactionTemplate;
-    private final KafkaProducer<String, ModerationRequestInfo> moderationRequestProducer;
-
-    @Value("${topic.moderation.requests}")
-    private String moderationRequestsTopic;
 
     private final Set<String> uploadLinks = new ConcurrentSkipListSet<>();
     private final Set<String> downloadLinks = new ConcurrentSkipListSet<>();
@@ -77,16 +69,12 @@ public class SourceServiceImpl implements SourceService {
             source.setSourceId(sourceId);
             source.setContent(content);
 
-            ModerationRequestInfo requestInfo = new ModerationRequestInfo();
-            requestInfo.setSourceId(sourceId);
-            requestInfo.setDownloadLink(generateDownloadLink(sourceId));
-            requestInfo.setCreatedAt(Instant.now());
-
             sourceRepository.save(source);
             uploadLinks.remove(sourceId);
             videoRepository.save(video);
-            moderationRequestProducer.send(new ProducerRecord<>(moderationRequestsTopic, requestInfo));
         });
+
+        requestSenderService.sendFirstTime(sourceId, generateDownloadLink(sourceId));
     }
 
     @Override

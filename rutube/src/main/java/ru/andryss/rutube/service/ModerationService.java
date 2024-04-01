@@ -17,6 +17,14 @@ public interface ModerationService {
      * @param createdAt creation timestamp
      */
     void handleResult(String sourceId, ModerationStatus status, String comment, Instant createdAt);
+
+    /**
+     * Handle moderation resend
+     *
+     * @param sourceId source to resend
+     */
+    void handleResend(String sourceId);
+
     /**
      * Find comment of moderation result
      *

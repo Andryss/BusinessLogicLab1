@@ -46,4 +46,11 @@ public interface ModerationService {
      * @return found moderation assignments
      */
     List<AssignmentInfo> findRequestsAssignedBefore(Instant timestamp);
+
+    /**
+     * Sends message to request moderation resending
+     *
+     * @param sourceId source to request
+     */
+    void requestResend(String sourceId);
 }

@@ -78,6 +78,14 @@ public interface VideoService {
      */
     List<Video> findVideosPendingActions(String author, Instant timestamp);
 
+    /**
+     * Finds videos pending moderations more then specified time
+     *
+     * @param timestamp videos updated earlier than timestamp will be ignored
+     * @return found source ids
+     */
+    List<String> findVideosPendingModeration(Instant timestamp);
+
     record VideoChangeInfo(String title, String description, VideoCategory category, VideoAccess access,
                            Boolean ageRestriction, Boolean comments) { }
 }

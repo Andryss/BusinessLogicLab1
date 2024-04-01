@@ -23,12 +23,18 @@ public class ModerationServiceImpl implements ModerationService {
 
     private final ModerationResultRepository resultRepository;
     private final VideoRepository videoRepository;
+    private final SourceService sourceService;
+    private final ModerationRequestSenderService requestSenderService;
     private final TransactionTemplate transactionTemplate;
     private final TransactionTemplate readOnlyTransactionTemplate;
 
     @Override
     public void handleResult(String sourceId, ModerationStatus status, String comment, Instant createdAt) {
         transactionTemplate.executeWithoutResult(s -> {
+            if (resultRepository.existsById(sourceId)) {
+                return;
+            }
+
             Video video = videoRepository.findById(sourceId).orElseThrow(() -> new VideoNotFoundException(sourceId));
             if (video.getStatus() != MODERATION_PENDING) {
                 throw new IncorrectVideoStatusException(video.getStatus(), MODERATION_PENDING);
@@ -52,6 +58,11 @@ public class ModerationServiceImpl implements ModerationService {
             resultRepository.save(result);
             videoRepository.save(video);
         });
+    }
+
+    @Override
+    public void handleResend(String sourceId) {
+        requestSenderService.resend(sourceId, sourceService.generateDownloadLink(sourceId));
     }
 
     @Override
