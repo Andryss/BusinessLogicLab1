@@ -64,7 +64,7 @@ public class KafkaConfiguration {
 
     @Bean
     public NewTopic moderationRequestsTopic() {
-        return new NewTopic(moderationRequestsTopic, 1, (short) 1);
+        return new NewTopic(moderationRequestsTopic, 2, (short) 1);
     }
 
     @Bean
